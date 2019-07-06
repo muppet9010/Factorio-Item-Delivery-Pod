@@ -301,5 +301,9 @@ data:extend(
     }
 )
 
-Utils.CreateLandPlacementTestEntityPrototype(data.raw["container"]["item_delivery_pod-large_wrecked_ship_container"], "item_delivery_pod-large_wrecked_ship_container_placement_test")
-Utils.CreateLandPlacementTestEntityPrototype(data.raw["container"]["item_delivery_pod-tiny_wrecked_ship_container"], "item_delivery_pod-tiny_wrecked_ship_container_placement_test")
+data:extend(
+    {
+        Utils.CreateLandPlacementTestEntityPrototype(data.raw["container"]["item_delivery_pod-small_wrecked_ship_container"], "item_delivery_pod-small_wrecked_ship_container_placement_test"),
+        Utils.CreateLandPlacementTestEntityPrototype(data.raw["container"]["item_delivery_pod-large_wrecked_ship_container"], "item_delivery_pod-large_wrecked_ship_container_placement_test")
+    }
+)

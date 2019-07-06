@@ -670,12 +670,14 @@ function Utils.CreateLandPlacementTestEntityPrototype(entityToClone, newEntityNa
     }
 end
 
-function Utils.GetValidPositionForEntityNearPosition(entityName, surface, centerPos, radius, maxAttempts)
+function Utils.GetValidPositionForEntityNearPosition(entityName, surface, centerPos, radius, maxAttempts, searchIncrement, allowNonTileCenter)
     local pos
     local attempts = 1
+    searchIncrement = searchIncrement or 1
+    allowNonTileCenter = allowNonTileCenter or false
     while pos == nil do
         local searchRadius = radius * attempts
-        pos = surface.find_non_colliding_position(entityName, centerPos, searchRadius, 1, true)
+        pos = surface.find_non_colliding_position(entityName, centerPos, searchRadius, searchIncrement, not allowNonTileCenter)
         if pos ~= nil then
             return pos
         end

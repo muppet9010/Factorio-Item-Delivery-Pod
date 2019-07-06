@@ -8,8 +8,7 @@ local EventScheduler = require("utility/event-scheduler")
 local FireTypes = require("static-data/fire-types")
 
 --[[TODO:
-    Make the ship collision box be entirely in or out of water.
-    Have effects and graphics based on in or out of water.
+    Have effects and graphics for if it crashes in to water. Allow ship parts to be entirely in or out of water.
     Add the start of the rocket launch sound to an invisible entity that is at the falling ship position.
 ]]
 ShipCrash.fallingTicks = 60 * 5
@@ -51,7 +50,7 @@ function ShipCrash.CallCrashShip(target, radius, crashTypeName, contents)
     local playerForce = game.forces[1]
 
     if crashType.hasTypeValue == false then
-        local crashSitePosition = Utils.RandomLocationInRadius(targetPos, radius)
+        local crashSitePosition = Utils.GetValidPositionForEntityNearPosition(crashType.container.placementTestEntityName, surface, Utils.RandomLocationInRadius(targetPos, radius), 10, 5)
         ShipCrash.StartCrashShipFalling(crashType, crashSitePosition, surface, playerForce, contents)
     else
         --TODO
@@ -136,7 +135,7 @@ end
 
 function ShipCrash.SpawnCrashShipOnGround(crashType, crashSitePosition, surface, playerForce, contents)
     surface.create_entity {name = crashType.container.explosionName, position = crashSitePosition}
-    local debrisPieces = ShipCrash.CalculateDebrisPieces(crashType, crashSitePosition)
+    local debrisPieces = ShipCrash.CalculateDebrisPieces(crashType, crashSitePosition, surface)
     for _, debrisPiece in ipairs(debrisPieces) do
         surface.create_entity {name = debrisPiece.debrisType.explosionName, position = debrisPiece.position}
     end
@@ -146,7 +145,7 @@ function ShipCrash.SpawnCrashShipOnGround(crashType, crashSitePosition, surface,
     end
 end
 
-function ShipCrash.CalculateDebrisPieces(parentType, crashSitePosition)
+function ShipCrash.CalculateDebrisPieces(parentType, crashSitePosition, surface)
     local debrisPieces = {}
     if parentType.debris == nil then
         return debrisPieces
@@ -161,14 +160,16 @@ function ShipCrash.CalculateDebrisPieces(parentType, crashSitePosition)
             local attempts = 0
             while pos == nil do
                 attempts = attempts + 1
-                pos = Utils.RandomLocationInRadius(crashSitePosition, minRadius, maxRadius)
-                if attempts > 100 then
-                    break
-                end
-                for _, otherDebrisPiece in ipairs(debrisPieces) do
-                    if Utils.GetDistance(pos, otherDebrisPiece.position) < 3 then
-                        pos = nil
+                pos = Utils.GetValidPositionForEntityNearPosition(debrisType.placementTestEntityName, surface, Utils.RandomLocationInRadius(crashSitePosition, minRadius, maxRadius), 2, 1, 0.2, true)
+                if pos ~= nil then
+                    if attempts > 100 then
                         break
+                    end
+                    for _, otherDebrisPiece in ipairs(debrisPieces) do
+                        if Utils.GetDistance(pos, otherDebrisPiece.position) < 3 then
+                            pos = nil
+                            break
+                        end
                     end
                 end
             end
@@ -231,7 +232,9 @@ function ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosit
     fireCount = math.random(math.floor(fireCount * 0.75), math.floor(fireCount * 1.5))
     for i = 1, fireCount do
         local pos = Utils.RandomLocationInRadius(craterPosition, minRadius, maxRadius)
-        ShipCrash.CreateRandomLengthFire(math.random(1, 2), surface, pos, 4, 7)
+        if not surface.get_tile(pos.x, pos.y).collides_with("water-tile") then
+            ShipCrash.CreateRandomLengthFire(math.random(1, 2), surface, pos, 4, 7)
+        end
     end
 end
 
@@ -262,8 +265,10 @@ function ShipCrash.PlaceRocksRandomlyWithinRadius(rockCount, rockEntityNames, su
     rockCount = math.random(math.floor(rockCount * 0.75), math.floor(rockCount * 1.25))
     for i = 1, rockCount do
         local pos = Utils.RandomLocationInRadius(craterPosition, minRadius, maxRadius)
-        local rockEntityName = rockEntityNames[math.random(#rockEntityNames)]
-        surface.create_decoratives {decoratives = {{name = rockEntityName, position = pos, amount = 1}}}
+        if not surface.get_tile(pos.x, pos.y).collides_with("water-tile") then
+            local rockEntityName = rockEntityNames[math.random(#rockEntityNames)]
+            surface.create_decoratives {decoratives = {{name = rockEntityName, position = pos, amount = 1}}}
+        end
     end
 end
 

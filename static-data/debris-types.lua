@@ -11,7 +11,8 @@ return {
         },
         shadowSize = 1.5,
         explosionSmokeName = "item_delivery_pod-small_crash_smoke",
-        explosionEffectName = "medium-explosion"
+        explosionEffectName = "medium-explosion",
+        placementTestEntityName = "item_delivery_pod-small_wrecked_ship_container_placement_test"
     },
     medium = {
         name = "medium",
@@ -25,6 +26,7 @@ return {
         },
         shadowSize = 2,
         explosionSmokeName = "item_delivery_pod-medium_crash_smoke",
-        explosionEffectName = "medium-explosion"
+        explosionEffectName = "medium-explosion",
+        placementTestEntityName = "item_delivery_pod-small_wrecked_ship_container_placement_test"
     }
 }

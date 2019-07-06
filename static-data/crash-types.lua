@@ -13,7 +13,8 @@ return {
             },
             shadowSize = 2,
             explosionSmokeName = "item_delivery_pod-medium_crash_smoke",
-            explosionEffectName = "medium-explosion"
+            explosionEffectName = "medium-explosion",
+            placementTestEntityName = "item_delivery_pod-small_wrecked_ship_container_placement_test"
         },
         debris = nil
     },
@@ -32,7 +33,8 @@ return {
             },
             shadowSize = 4,
             explosionSmokeName = "item_delivery_pod-large_crash_smoke",
-            explosionEffectName = "massive-explosion"
+            explosionEffectName = "massive-explosion",
+            placementTestEntityName = "item_delivery_pod-small_wrecked_ship_container_placement_test"
         },
         debris = nil
     },
@@ -51,7 +53,8 @@ return {
             },
             shadowSize = 5,
             explosionSmokeName = "item_delivery_pod-large_crash_smoke",
-            explosionEffectName = "massive-explosion"
+            explosionEffectName = "massive-explosion",
+            placementTestEntityName = "item_delivery_pod-large_wrecked_ship_container_placement_test"
         },
         debris = {small = 3}
     },
@@ -70,7 +73,8 @@ return {
             },
             shadowSize = 6,
             explosionSmokeName = "item_delivery_pod-massive_crash_smoke",
-            explosionEffectName = "massive-explosion"
+            explosionEffectName = "massive-explosion",
+            placementTestEntityName = "item_delivery_pod-large_wrecked_ship_container_placement_test"
         },
         debris = {small = 5}
     },
