@@ -1,4 +1,5 @@
 local Constants = require("constants")
+local Utils = require("utility/utils")
 
 data:extend(
     {
@@ -96,9 +97,9 @@ data:extend(
             type = "sprite",
             name = "item_delivery_pod-medium_wrecked_ship_container_falling",
             filename = Constants.AssetModName .. "/graphics/entities/medium_wrecked_ship_container_falling.png",
-            width = 164,
-            height = 129,
-            shift = {-0.3, 0.6}
+            width = 279,
+            height = 337,
+            shift = {-1, -2}
         },
         {
             type = "container",
@@ -129,14 +130,14 @@ data:extend(
             type = "sprite",
             name = "item_delivery_pod-large_wrecked_ship_container_falling",
             filename = Constants.AssetModName .. "/graphics/entities/large_wrecked_ship_container_falling.png",
-            width = 256,
-            height = 212,
-            shift = {0.7, 0}
+            width = 376,
+            height = 449,
+            shift = {-1, -3}
         },
         {
             type = "container",
             name = "item_delivery_pod-modular_bridge_wrecked_ship_container",
-            localised_name = "item_delivery_pod-modular_wrecked_ship_container",
+            localised_name = {"item_delivery_pod-modular_wrecked_ship_container"},
             order = "zzz-wrecked_ship-5",
             icon = Constants.AssetModName .. "/graphics/icons/modular_bridge_wrecked_ship_container.png",
             icon_size = 32,
@@ -170,7 +171,7 @@ data:extend(
         {
             type = "container",
             name = "item_delivery_pod-modular_thruster_wrecked_ship_container",
-            localised_name = "item_delivery_pod-modular_wrecked_ship_container",
+            localised_name = {"item_delivery_pod-modular_wrecked_ship_container"},
             order = "zzz-wrecked_ship-6",
             icon = Constants.AssetModName .. "/graphics/icons/modular_thruster_wrecked_ship_container.png",
             icon_size = 32,
@@ -299,3 +300,6 @@ data:extend(
         }
     }
 )
+
+Utils.CreateLandPlacementTestEntityPrototype(data.raw["container"]["item_delivery_pod-large_wrecked_ship_container"], "item_delivery_pod-large_wrecked_ship_container_placement_test")
+Utils.CreateLandPlacementTestEntityPrototype(data.raw["container"]["item_delivery_pod-tiny_wrecked_ship_container"], "item_delivery_pod-tiny_wrecked_ship_container_placement_test")

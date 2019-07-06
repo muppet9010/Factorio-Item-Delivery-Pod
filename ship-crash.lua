@@ -10,7 +10,7 @@ local FireTypes = require("static-data/fire-types")
 --[[TODO:
     Make the ship collision box be entirely in or out of water.
     Have effects and graphics based on in or out of water.
-    Create medium/massive-explosion entity at impact site of ship/debris bits.
+    Add the start of the rocket launch sound to an invisible entity that is at the falling ship position.
 ]]
 ShipCrash.fallingTicks = 60 * 5
 ShipCrash.fallingStartHeight = 500
@@ -63,7 +63,7 @@ function ShipCrash.StartCrashShipFalling(crashType, crashSitePosition, surface, 
     local data = {
         targetPos = crashSitePosition,
         surface = surface,
-        force = playerForce,
+        playerForce = playerForce,
         contents = contents,
         crashType = crashType,
         ticksFallingCount = 0,
@@ -121,10 +121,6 @@ function ShipCrash.UpdateShipShadowData(data)
     data.currentHeight = ShipCrash.fallingStartHeight - (ShipCrash.fallingTickSpeed * data.ticksFallingCount)
     data.shipPos = Utils.GetPositionForAngledDistance(data.targetPos, data.currentHeight, ShipCrash.entryAngle)
     data.shadowPos = ShipCrash.CalculateShadowForShip(data.shipPos, data.currentHeight)
-    --[[Logging.Log("currentHeight: " .. data.currentHeight)
-    Logging.Log("shipPos: " .. Logging.PositionToString(data.shipPos))
-    Logging.Log("shadowPos: " .. Logging.PositionToString(data.shadowPos))
-    Logging.Log("")]]
     local imageScale = ShipCrash.startingImageScale + (ShipCrash.imageScaleChangePerTick * data.ticksFallingCount)
     data.shipScale = imageScale
     data.shadowScale = imageScale * data.crashTypeShadowScale
@@ -140,7 +136,7 @@ end
 
 function ShipCrash.SpawnCrashShipOnGround(crashType, crashSitePosition, surface, playerForce, contents)
     surface.create_entity {name = crashType.container.explosionName, position = crashSitePosition}
-    local debrisPieces = ShipCrash.CalculateDebris(crashType, crashSitePosition)
+    local debrisPieces = ShipCrash.CalculateDebrisPieces(crashType, crashSitePosition)
     for _, debrisPiece in ipairs(debrisPieces) do
         surface.create_entity {name = debrisPiece.debrisType.explosionName, position = debrisPiece.position}
     end
@@ -150,7 +146,7 @@ function ShipCrash.SpawnCrashShipOnGround(crashType, crashSitePosition, surface,
     end
 end
 
-function ShipCrash.CalculateDebris(parentType, crashSitePosition)
+function ShipCrash.CalculateDebrisPieces(parentType, crashSitePosition)
     local debrisPieces = {}
     if parentType.debris == nil then
         return debrisPieces
@@ -159,14 +155,24 @@ function ShipCrash.CalculateDebris(parentType, crashSitePosition)
     local maxRadius = parentType.container.killRadius + (parentType.container.killRadius * 0.25)
     for debrisSize, debrisCount in pairs(parentType.debris) do
         local debrisType = DebrisTypes[debrisSize]
-        for i = 1, math.random(debrisCount - 1, debrisCount + 1) do
-            table.insert(
-                debrisPieces,
-                {
-                    debrisType = debrisType,
-                    position = Utils.RandomLocationInRadius(crashSitePosition, minRadius, maxRadius)
-                }
-            )
+        local totalDebrisCount = math.random(debrisCount - 1, debrisCount + 1)
+        for i = 1, totalDebrisCount do
+            local pos
+            local attempts = 0
+            while pos == nil do
+                attempts = attempts + 1
+                pos = Utils.RandomLocationInRadius(crashSitePosition, minRadius, maxRadius)
+                if attempts > 100 then
+                    break
+                end
+                for _, otherDebrisPiece in ipairs(debrisPieces) do
+                    if Utils.GetDistance(pos, otherDebrisPiece.position) < 3 then
+                        pos = nil
+                        break
+                    end
+                end
+            end
+            table.insert(debrisPieces, {debrisType = debrisType, position = pos})
         end
     end
     return debrisPieces
@@ -176,6 +182,7 @@ function ShipCrash.CreateDebris(debrisType, surface, position, playerForce)
     surface.create_entity {name = debrisType.entityName, position = position, force = playerForce}
     ShipCrash.CreateCraterImpact(debrisType.craterName, debrisType.rocks, debrisType.killRadius, surface, position)
     ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, 5, 10)
+    surface.create_entity {name = debrisType.explosionEffectName, position = position}
 end
 
 function ShipCrash.CreateContainer(containerDetails, surface, position, contents, playerForce)
@@ -190,6 +197,7 @@ function ShipCrash.CreateContainer(containerDetails, surface, position, contents
         end
     end
     ShipCrash.CreateCraterImpact(containerDetails.craterName, containerDetails.rocks, containerDetails.killRadius, surface, position)
+    surface.create_entity {name = containerDetails.explosionEffectName, position = position}
 end
 
 function ShipCrash.CreateCraterImpact(craterName, rocks, radius, surface, craterPosition)

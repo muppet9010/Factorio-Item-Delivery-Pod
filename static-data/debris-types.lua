@@ -10,7 +10,8 @@ return {
             tiny = 10
         },
         shadowSize = 1.5,
-        explosionSmokeName = "item_delivery_pod-small_crash_smoke"
+        explosionSmokeName = "item_delivery_pod-small_crash_smoke",
+        explosionEffectName = "medium-explosion"
     },
     medium = {
         name = "medium",
@@ -23,6 +24,7 @@ return {
             tiny = 20
         },
         shadowSize = 2,
-        explosionSmokeName = "item_delivery_pod-medium_crash_smoke"
+        explosionSmokeName = "item_delivery_pod-medium_crash_smoke",
+        explosionEffectName = "medium-explosion"
     }
 }

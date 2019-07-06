@@ -12,7 +12,8 @@ return {
                 tiny = 20
             },
             shadowSize = 2,
-            explosionSmokeName = "item_delivery_pod-medium_crash_smoke"
+            explosionSmokeName = "item_delivery_pod-medium_crash_smoke",
+            explosionEffectName = "medium-explosion"
         },
         debris = nil
     },
@@ -30,7 +31,8 @@ return {
                 tiny = 50
             },
             shadowSize = 4,
-            explosionSmokeName = "item_delivery_pod-large_crash_smoke"
+            explosionSmokeName = "item_delivery_pod-large_crash_smoke",
+            explosionEffectName = "massive-explosion"
         },
         debris = nil
     },
@@ -48,7 +50,8 @@ return {
                 tiny = 100
             },
             shadowSize = 5,
-            explosionSmokeName = "item_delivery_pod-large_crash_smoke"
+            explosionSmokeName = "item_delivery_pod-large_crash_smoke",
+            explosionEffectName = "massive-explosion"
         },
         debris = {small = 3}
     },
@@ -66,7 +69,8 @@ return {
                 tiny = 200
             },
             shadowSize = 6,
-            explosionSmokeName = "item_delivery_pod-massive_crash_smoke"
+            explosionSmokeName = "item_delivery_pod-massive_crash_smoke",
+            explosionEffectName = "massive-explosion"
         },
         debris = {small = 5}
     },
