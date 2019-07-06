@@ -8,7 +8,9 @@ return {
         rocks = {
             small = 3,
             tiny = 10
-        }
+        },
+        shadowSize = 1.5,
+        explosionSmokeName = "item_delivery_pod-small_crash_smoke"
     },
     medium = {
         name = "medium",
@@ -19,6 +21,8 @@ return {
         rocks = {
             small = 10,
             tiny = 20
-        }
+        },
+        shadowSize = 2,
+        explosionSmokeName = "item_delivery_pod-medium_crash_smoke"
     }
 }

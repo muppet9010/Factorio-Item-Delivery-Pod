@@ -124,8 +124,8 @@ function Utils.RotatePositionAround0(orientation, position)
     local rad = math.rad(deg)
     local cosValue = math.cos(rad)
     local sinValue = math.sin(rad)
-    local rotatedX = position.x * cosValue - position.y * sinValue
-    local rotatedY = position.x * sinValue + position.y * cosValue
+    local rotatedX = (position.x * cosValue) - (position.y * sinValue)
+    local rotatedY = (position.x * sinValue) + (position.y * cosValue)
     return {x = rotatedX, y = rotatedY}
 end
 
@@ -703,10 +703,22 @@ function Utils.RandomLocationInRadius(centrePos, maxRadius, minRadius)
     local radiusMultiplier = maxRadius - minRadius
     local distance = minRadius + (math.random() * radiusMultiplier)
     local randomPos = {
-        x = (distance * math.cos(angleRad)) + centrePos.x,
-        y = (distance * math.sin(angleRad)) + centrePos.y
+        x = (distance * math.sin(angleRad)) + centrePos.x,
+        y = (distance * -math.cos(angleRad)) + centrePos.y
     }
     return randomPos
+end
+
+function Utils.GetPositionForAngledDistance(startingPos, distance, angle)
+    if angle < 0 then
+        angle = 360 + angle
+    end
+    local angleRad = math.rad(angle)
+    local newPos = {
+        x = (distance * math.sin(angleRad)) + startingPos.x,
+        y = (distance * -math.cos(angleRad)) + startingPos.y
+    }
+    return newPos
 end
 
 return Utils

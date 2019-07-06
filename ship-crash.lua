@@ -7,6 +7,20 @@ local DebrisTypes = require("static-data/debris-types")
 local EventScheduler = require("utility/event-scheduler")
 local FireTypes = require("static-data/fire-types")
 
+--[[TODO:
+    Make the ship collision box be entirely in or out of water.
+    Have effects and graphics based on in or out of water.
+    Create medium/massive-explosion entity at impact site of ship/debris bits.
+]]
+ShipCrash.fallingTicks = 60 * 5
+ShipCrash.fallingStartHeight = 500
+ShipCrash.fallingTickSpeed = ShipCrash.fallingStartHeight / ShipCrash.fallingTicks
+ShipCrash.entryAngle = -30
+ShipCrash.shipCreateHeight = 300
+ShipCrash.shadowGroundOffsetMultiplier = {x = 60 / 100, y = 48 / 100}
+ShipCrash.startingImageScale = 0.1
+ShipCrash.imageScaleChangePerTick = (1 - ShipCrash.startingImageScale) / ShipCrash.fallingTicks
+
 function ShipCrash.CreateGlobals()
     global.ShipCrash = global.ShipCrash or {}
     global.ShipCrash.fireEntityInstanceId = global.ShipCrash.fireEntityInstanceId or 1
@@ -15,6 +29,7 @@ end
 function ShipCrash.OnLoad()
     Commands.Register("item_delivery_pod-call_crash_ship", {"api-description.item_delivery_pod-call_crash_ship"}, ShipCrash.CallCrashShipCommand, true)
     EventScheduler.RegisterScheduledEventType("ShipCrash.RenewFireScheduledEvent", ShipCrash.RenewFireScheduledEvent)
+    EventScheduler.RegisterScheduledEventType("ShipCrash.UpdateFallingShipScheduledEvent", ShipCrash.UpdateFallingShipScheduledEvent)
 end
 
 function ShipCrash.CallCrashShipCommand(command)
@@ -32,28 +47,106 @@ function ShipCrash.CallCrashShip(target, radius, crashTypeName, contents)
         return
     end
 
-    local crashSitePosition = Utils.RandomLocationInRadius(targetPos, radius)
     local surface = game.surfaces[1]
     local playerForce = game.forces[1]
 
-    --TODO: do falling effect before doing the ground impact
-    ShipCrash.SpawnCrashShipOnGround(crashType, typeValue, crashSitePosition, surface, playerForce, contents)
-end
-
-function ShipCrash.SpawnCrashShipOnGround(crashType, typeValue, crashSitePosition, surface, playerForce, contents)
     if crashType.hasTypeValue == false then
-        surface.create_entity {name = crashType.container.explosionName, position = crashSitePosition}
-        local debrisPieces = ShipCrash.CalculateDebris(crashType, crashSitePosition)
-        for _, debrisPiece in ipairs(debrisPieces) do
-            surface.create_entity {name = debrisPiece.debrisType.explosionName, position = debrisPiece.position}
-        end
-        ShipCrash.CreateContainer(crashType.container, surface, crashSitePosition, contents, playerForce)
-        for _, debrisPiece in ipairs(debrisPieces) do
-            ShipCrash.CreateDebris(debrisPiece.debrisType, surface, debrisPiece.position, playerForce)
-        end
+        local crashSitePosition = Utils.RandomLocationInRadius(targetPos, radius)
+        ShipCrash.StartCrashShipFalling(crashType, crashSitePosition, surface, playerForce, contents)
     else
         --TODO
-        game.print("MODULAR CRASH NOT CODED YET")
+        game.print("MODULAR CRASH NOT CODED YET: " .. typeValue)
+    end
+end
+
+function ShipCrash.StartCrashShipFalling(crashType, crashSitePosition, surface, playerForce, contents)
+    local data = {
+        targetPos = crashSitePosition,
+        surface = surface,
+        force = playerForce,
+        contents = contents,
+        crashType = crashType,
+        ticksFallingCount = 0,
+        crashTypeShadowScale = crashType.container.shadowSize / 7,
+        shipRenderId = nil,
+        shadowRenderId = nil,
+        shadowScale = 0,
+        shipScale = 0
+    }
+    data = ShipCrash.UpdateShipShadowData(data)
+    data.shadowRenderId =
+        rendering.draw_sprite {
+        sprite = "item_delivery_pod-generic_wreck_sprite",
+        target = data.shadowPos,
+        surface = data.surface,
+        x_scale = data.shadowScale,
+        y_scale = data.shadowScale
+    }
+    EventScheduler.ScheduleEvent(game.tick + 1, "ShipCrash.UpdateFallingShipScheduledEvent", data.shadowRenderId, data)
+end
+
+function ShipCrash.UpdateFallingShipScheduledEvent(event)
+    local data = event.data
+    data.ticksFallingCount = data.ticksFallingCount + 1
+    if data.ticksFallingCount > ShipCrash.fallingTicks then
+        rendering.destroy(data.shadowRenderId)
+        rendering.destroy(data.shipRenderId)
+        ShipCrash.SpawnCrashShipOnGround(data.crashType, data.targetPos, data.surface, data.playerForce, data.contents)
+        return
+    end
+
+    data = ShipCrash.UpdateShipShadowData(data)
+    if data.shipRenderId == nil and data.currentHeight <= ShipCrash.shipCreateHeight then
+        data.shipRenderId =
+            rendering.draw_sprite {
+            sprite = data.crashType.container.entityName .. "_falling",
+            target = data.shipPos,
+            surface = data.surface,
+            x_scale = data.shipScale,
+            y_scale = data.shipScale
+        }
+    elseif data.shipRenderId ~= nil then
+        rendering.set_target(data.shipRenderId, data.shipPos)
+        rendering.set_x_scale(data.shipRenderId, data.shipScale)
+        rendering.set_y_scale(data.shipRenderId, data.shipScale)
+    end
+
+    rendering.set_target(data.shadowRenderId, data.shadowPos)
+    rendering.set_x_scale(data.shadowRenderId, data.shadowScale)
+    rendering.set_y_scale(data.shadowRenderId, data.shadowScale)
+    EventScheduler.ScheduleEvent(event.tick + 1, "ShipCrash.UpdateFallingShipScheduledEvent", data.shadowRenderId, data)
+end
+
+function ShipCrash.UpdateShipShadowData(data)
+    data.currentHeight = ShipCrash.fallingStartHeight - (ShipCrash.fallingTickSpeed * data.ticksFallingCount)
+    data.shipPos = Utils.GetPositionForAngledDistance(data.targetPos, data.currentHeight, ShipCrash.entryAngle)
+    data.shadowPos = ShipCrash.CalculateShadowForShip(data.shipPos, data.currentHeight)
+    --[[Logging.Log("currentHeight: " .. data.currentHeight)
+    Logging.Log("shipPos: " .. Logging.PositionToString(data.shipPos))
+    Logging.Log("shadowPos: " .. Logging.PositionToString(data.shadowPos))
+    Logging.Log("")]]
+    local imageScale = ShipCrash.startingImageScale + (ShipCrash.imageScaleChangePerTick * data.ticksFallingCount)
+    data.shipScale = imageScale
+    data.shadowScale = imageScale * data.crashTypeShadowScale
+    return data
+end
+
+function ShipCrash.CalculateShadowForShip(shipPos, currentHeigt)
+    return {
+        x = shipPos.x + (ShipCrash.shadowGroundOffsetMultiplier.x * currentHeigt),
+        y = shipPos.y + currentHeigt + (ShipCrash.shadowGroundOffsetMultiplier.y * currentHeigt)
+    }
+end
+
+function ShipCrash.SpawnCrashShipOnGround(crashType, crashSitePosition, surface, playerForce, contents)
+    surface.create_entity {name = crashType.container.explosionName, position = crashSitePosition}
+    local debrisPieces = ShipCrash.CalculateDebris(crashType, crashSitePosition)
+    for _, debrisPiece in ipairs(debrisPieces) do
+        surface.create_entity {name = debrisPiece.debrisType.explosionName, position = debrisPiece.position}
+    end
+    ShipCrash.CreateContainer(crashType.container, surface, crashSitePosition, contents, playerForce)
+    for _, debrisPiece in ipairs(debrisPieces) do
+        ShipCrash.CreateDebris(debrisPiece.debrisType, surface, debrisPiece.position, playerForce)
     end
 end
 

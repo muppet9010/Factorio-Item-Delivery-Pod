@@ -5,6 +5,7 @@ local function GenerateFireType(entityName, initialLifetime)
     local fireEntity = Utils.DeepCopy(data.raw["fire"]["fire-flame"])
     fireEntity.name = entityName
     fireEntity.initial_lifetime = initialLifetime
+    fireEntity.smoke = data.raw["fire"]["fire-flame-on-tree"].smoke
     data:extend({fireEntity})
 end
 for _, fireType in pairs(FireTypes) do

@@ -1,8 +1,8 @@
 local CrashTypes = require("static-data/crash-types")
 local DebrisTypes = require("static-data/debris-types")
 
-local function GenerateExplosions(name, radius)
-    --TODO: add smoke to conceal the item
+local function GenerateExplosions(name, radius, explosionSmokeName)
+    local smokeDeviationRadius = radius * 1.5
     data:extend(
         {
             {
@@ -15,6 +15,20 @@ local function GenerateExplosions(name, radius)
                     frame_count = 1
                 },
                 created_effect = {
+                    {
+                        type = "direct",
+                        repeat_count = 10,
+                        action_delivery = {
+                            type = "instant",
+                            target_effects = {
+                                {
+                                    type = "create-trivial-smoke",
+                                    smoke_name = explosionSmokeName,
+                                    offset_deviation = {{-smokeDeviationRadius, -smokeDeviationRadius}, {smokeDeviationRadius, smokeDeviationRadius}}
+                                }
+                            }
+                        }
+                    },
                     {
                         type = "area",
                         radius = radius,
@@ -50,11 +64,11 @@ local function GenerateExplosions(name, radius)
 end
 for _, crashType in pairs(CrashTypes) do
     if crashType.container ~= nil and crashType.container.killRadius ~= nil then
-        GenerateExplosions(crashType.container.explosionName, crashType.container.killRadius)
+        GenerateExplosions(crashType.container.explosionName, crashType.container.killRadius, crashType.container.explosionSmokeName)
     end
 end
 for _, debrisType in pairs(DebrisTypes) do
     if debrisType.killRadius ~= nil then
-        GenerateExplosions(debrisType.explosionName, debrisType.killRadius)
+        GenerateExplosions(debrisType.explosionName, debrisType.killRadius, debrisType.explosionSmokeName)
     end
 end

@@ -27,6 +27,14 @@ data:extend(
             inventory_size = 999
         },
         {
+            type = "sprite",
+            name = "item_delivery_pod-tiny_wrecked_ship_container_falling",
+            filename = Constants.AssetModName .. "/graphics/entities/tiny_wrecked_ship_container_falling.png",
+            width = 132,
+            height = 162,
+            shift = {-0.1, -1.5}
+        },
+        {
             type = "container",
             name = "item_delivery_pod-small_wrecked_ship_container",
             order = "zzz-wrecked_ship-2",
@@ -50,6 +58,14 @@ data:extend(
                 shift = {-0.8, -0.8}
             },
             inventory_size = 999
+        },
+        {
+            type = "sprite",
+            name = "item_delivery_pod-small_wrecked_ship_container_falling",
+            filename = Constants.AssetModName .. "/graphics/entities/small_wrecked_ship_container_falling.png",
+            width = 227,
+            height = 270,
+            shift = {-1.5, -2.5}
         },
         {
             type = "container",
@@ -77,6 +93,14 @@ data:extend(
             inventory_size = 999
         },
         {
+            type = "sprite",
+            name = "item_delivery_pod-medium_wrecked_ship_container_falling",
+            filename = Constants.AssetModName .. "/graphics/entities/medium_wrecked_ship_container_falling.png",
+            width = 164,
+            height = 129,
+            shift = {-0.3, 0.6}
+        },
+        {
             type = "container",
             name = "item_delivery_pod-large_wrecked_ship_container",
             order = "zzz-wrecked_ship-4",
@@ -100,6 +124,14 @@ data:extend(
                 shift = {0.7, 0}
             },
             inventory_size = 999
+        },
+        {
+            type = "sprite",
+            name = "item_delivery_pod-large_wrecked_ship_container_falling",
+            filename = Constants.AssetModName .. "/graphics/entities/large_wrecked_ship_container_falling.png",
+            width = 256,
+            height = 212,
+            shift = {0.7, 0}
         },
         {
             type = "container",
@@ -128,6 +160,14 @@ data:extend(
             inventory_size = 999
         },
         {
+            type = "sprite",
+            name = "item_delivery_pod-modular_bridge_wrecked_ship_container_falling",
+            filename = Constants.AssetModName .. "/graphics/entities/modular_bridge_wrecked_ship_container_falling.png",
+            width = 120,
+            height = 85,
+            shift = {0.2, -0.2}
+        },
+        {
             type = "container",
             name = "item_delivery_pod-modular_thruster_wrecked_ship_container",
             localised_name = "item_delivery_pod-modular_wrecked_ship_container",
@@ -151,6 +191,13 @@ data:extend(
                 height = 85
             },
             inventory_size = 999
+        },
+        {
+            type = "sprite",
+            name = "item_delivery_pod-modular_thruster_wrecked_ship_container_falling",
+            filename = Constants.AssetModName .. "/graphics/entities/modular_thruster_wrecked_ship_container_falling.png",
+            width = 120,
+            height = 85
         },
         {
             type = "simple-entity",
@@ -241,6 +288,14 @@ data:extend(
                 }
             },
             render_layer = "object"
+        },
+        {
+            type = "sprite",
+            name = "item_delivery_pod-generic_wreck_sprite",
+            filename = Constants.AssetModName .. "/graphics/entities/generic_falling_shadow.png",
+            width = 256,
+            height = 256,
+            draw_as_shadow = true
         }
     }
 )
