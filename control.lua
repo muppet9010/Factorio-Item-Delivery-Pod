@@ -1,6 +1,8 @@
 local ShipCrash = require("ship-crash")
+local EventScheduler = require("utility/event-scheduler")
 
 local function CreateGlobals()
+    ShipCrash.CreateGlobals()
 end
 
 local function OnLoad()
@@ -16,6 +18,7 @@ end
 script.on_init(OnStartup)
 script.on_configuration_changed(OnStartup)
 script.on_load(OnLoad)
+EventScheduler.RegisterScheduler()
 
 remote.add_interface(
     "item_delivery_pod",

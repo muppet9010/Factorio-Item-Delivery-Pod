@@ -1,6 +1,12 @@
 local Utils = require("utility/utils")
+local FireTypes = require("static-data/fire-types")
 
-local debrisFire = Utils.DeepCopy(data.raw["fire"]["fire-flame-on-tree"])
-debrisFire.name = "item_delivery_pod-debris_fire_flame"
-debrisFire.initial_lifetime = 600
-data:extend({debrisFire})
+local function GenerateFireType(entityName, initialLifetime)
+    local fireEntity = Utils.DeepCopy(data.raw["fire"]["fire-flame"])
+    fireEntity.name = entityName
+    fireEntity.initial_lifetime = initialLifetime
+    data:extend({fireEntity})
+end
+for _, fireType in pairs(FireTypes) do
+    GenerateFireType(fireType.entityName, fireType.initialLifetime)
+end

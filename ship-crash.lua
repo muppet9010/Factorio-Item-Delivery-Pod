@@ -4,9 +4,17 @@ local Utils = require("utility/utils")
 local Logging = require("utility/logging")
 local CrashTypes = require("static-data/crash-types")
 local DebrisTypes = require("static-data/debris-types")
+local EventScheduler = require("utility/event-scheduler")
+local FireTypes = require("static-data/fire-types")
+
+function ShipCrash.CreateGlobals()
+    global.ShipCrash = global.ShipCrash or {}
+    global.ShipCrash.fireEntityInstanceId = global.ShipCrash.fireEntityInstanceId or 1
+end
 
 function ShipCrash.OnLoad()
     Commands.Register("item_delivery_pod-call_crash_ship", {"api-description.item_delivery_pod-call_crash_ship"}, ShipCrash.CallCrashShipCommand, true)
+    EventScheduler.RegisterScheduledEventType("ShipCrash.RenewFireScheduledEvent", ShipCrash.RenewFireScheduledEvent)
 end
 
 function ShipCrash.CallCrashShipCommand(command)
@@ -74,7 +82,7 @@ end
 function ShipCrash.CreateDebris(debrisType, surface, position, playerForce)
     surface.create_entity {name = debrisType.entityName, position = position, force = playerForce}
     ShipCrash.CreateCraterImpact(debrisType.craterName, debrisType.rocks, debrisType.killRadius, surface, position)
-    surface.create_entity {name = "item_delivery_pod-debris_fire_flame", position = position, initial_ground_flame_count = 10}
+    ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, 5, 10)
 end
 
 function ShipCrash.CreateContainer(containerDetails, surface, position, contents, playerForce)
@@ -89,7 +97,6 @@ function ShipCrash.CreateContainer(containerDetails, surface, position, contents
         end
     end
     ShipCrash.CreateCraterImpact(containerDetails.craterName, containerDetails.rocks, containerDetails.killRadius, surface, position)
-    --TODO: create some fire around the container
 end
 
 function ShipCrash.CreateCraterImpact(craterName, rocks, radius, surface, craterPosition)
@@ -112,6 +119,42 @@ function ShipCrash.CreateCraterImpact(craterName, rocks, radius, surface, crater
             ShipCrash.PlaceRocksRandomlyWithinRadius(rockCount, rockEntityNames, surface, craterPosition, minRadius, maxRadius)
         end
     end
+
+    local fireMinRadius = radius * 0.25
+    local fireMaxRadius = radius * 1.25
+    local fireCount = math.ceil(math.sqrt(rocks["small"]) * 1.5)
+    ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosition, fireMinRadius, fireMaxRadius)
+end
+
+function ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosition, minRadius, maxRadius)
+    fireCount = math.random(math.floor(fireCount * 0.75), math.floor(fireCount * 1.5))
+    for i = 1, fireCount do
+        local pos = Utils.RandomLocationInRadius(craterPosition, minRadius, maxRadius)
+        ShipCrash.CreateRandomLengthFire(math.random(1, 2), surface, pos, 4, 7)
+    end
+end
+
+function ShipCrash.CreateRandomLengthFire(fireCount, surface, position, minSecondsPerFlame, maxSecondsPerFlame)
+    surface.create_entity {name = "item_delivery_pod-debris_fire_flame", position = position, initial_ground_flame_count = fireCount}
+    local secondsPerFlame = math.random(minSecondsPerFlame, maxSecondsPerFlame)
+    local flameInstanceId = global.ShipCrash.fireEntityInstanceId
+    global.ShipCrash.fireEntityInstanceId = global.ShipCrash.fireEntityInstanceId + 1
+    EventScheduler.ScheduleEvent(game.tick + FireTypes["debris"].initialLifetime, "ShipCrash.RenewFireScheduledEvent", flameInstanceId, {fireCount = fireCount, surface = surface, position = position, secondsPerFlame = secondsPerFlame, currentBurnTime = 1})
+end
+
+function ShipCrash.RenewFireScheduledEvent(event)
+    local data = event.data
+    if data.currentBurnTime >= data.secondsPerFlame then
+        data.fireCount = data.fireCount - 1
+        data.currentBurnTime = 1
+    else
+        data.currentBurnTime = data.currentBurnTime + 1
+    end
+    if data.fireCount <= 0 then
+        return
+    end
+    data.surface.create_entity {name = "item_delivery_pod-debris_fire_flame", position = data.position, initial_ground_flame_count = data.fireCount}
+    EventScheduler.ScheduleEvent(event.tick + FireTypes["debris"].initialLifetime, "ShipCrash.RenewFireScheduledEvent", event.instanceId, data)
 end
 
 function ShipCrash.PlaceRocksRandomlyWithinRadius(rockCount, rockEntityNames, surface, craterPosition, minRadius, maxRadius)
