@@ -2,93 +2,10 @@ local ShipCrash = {}
 local Commands = require("utility/commands")
 local Utils = require("utility/utils")
 local Logging = require("utility/logging")
+local CrashTypes = require("static-data/crash-types")
+local DebrisTypes = require("static-data/debris-types")
 
-ShipCrash.crashTypes = {
-    tiny = {
-        name = "tiny",
-        hasTypeValue = false,
-        container = {
-            entityName = "item_delivery_pod-tiny_wrecked_ship_container",
-            craterName = "medium-scorchmark",
-            killRadius = 1.5,
-            rocks = {
-                small = 10,
-                tiny = 20
-            }
-        },
-        debris = nil
-    },
-    small = {
-        name = "small",
-        hasTypeValue = false,
-        container = {
-            entityName = "item_delivery_pod-small_wrecked_ship_container",
-            craterName = "large-scorchmark",
-            killRadius = 3,
-            rocks = {
-                medium = 7,
-                small = 30,
-                tiny = 50
-            }
-        },
-        debris = nil
-    },
-    medium = {
-        name = "medium",
-        hasTypeValue = false,
-        container = {
-            entityName = "item_delivery_pod-medium_wrecked_ship_container",
-            craterName = "large-scorchmark",
-            killRadius = 4.5,
-            rocks = {
-                medium = 15,
-                small = 50,
-                tiny = 100
-            }
-        },
-        debris = nil
-    },
-    large = {
-        name = "large",
-        hasTypeValue = false,
-        container = {
-            entityName = "item_delivery_pod-large_wrecked_ship_container",
-            craterName = "large-scorchmark",
-            killRadius = 6,
-            rocks = {
-                medium = 30,
-                small = 100,
-                tiny = 200
-            }
-        },
-        debris = nil
-    },
-    modular = {
-        name = "modular",
-        hasTypeValue = true
-    }
-}
-
---[[
-ShipCrash.craterTypes = {
-    small = {
-        name = "small",
-        entityName = "small-scorchmark",
-        killRadius = 0.6 + 0.5,
-        rocks = {
-            small = 5,
-            tiny = 10
-        }
-    }
-}
-]]
 function ShipCrash.OnLoad()
-    remote.add_interface(
-        "item_delivery_pod",
-        {
-            call_crash_ship = ShipCrash.CallCrashShip
-        }
-    )
     Commands.Register("item_delivery_pod-call_crash_ship", {"api-description.item_delivery_pod-call_crash_ship"}, ShipCrash.CallCrashShipCommand, true)
 end
 
@@ -111,30 +28,68 @@ function ShipCrash.CallCrashShip(target, radius, crashTypeName, contents)
     local surface = game.surfaces[1]
     local playerForce = game.forces[1]
 
+    --TODO: do falling effect before doing the ground impact
+    ShipCrash.SpawnCrashShipOnGround(crashType, typeValue, crashSitePosition, surface, playerForce, contents)
+end
+
+function ShipCrash.SpawnCrashShipOnGround(crashType, typeValue, crashSitePosition, surface, playerForce, contents)
     if crashType.hasTypeValue == false then
+        surface.create_entity {name = crashType.container.explosionName, position = crashSitePosition}
+        local debrisPieces = ShipCrash.CalculateDebris(crashType, crashSitePosition)
+        for _, debrisPiece in ipairs(debrisPieces) do
+            surface.create_entity {name = debrisPiece.debrisType.explosionName, position = debrisPiece.position}
+        end
         ShipCrash.CreateContainer(crashType.container, surface, crashSitePosition, contents, playerForce)
+        for _, debrisPiece in ipairs(debrisPieces) do
+            ShipCrash.CreateDebris(debrisPiece.debrisType, surface, debrisPiece.position, playerForce)
+        end
     else
         --TODO
         game.print("MODULAR CRASH NOT CODED YET")
     end
 end
 
-function ShipCrash.CreateContainer(containerDetails, surface, crashSitePosition, contents, playerForce)
-    ShipCrash.KillAllInCraterImpact(containerDetails.killRadius, surface, crashSitePosition)
-    local container = surface.create_entity {name = containerDetails.entityName, position = crashSitePosition, force = playerForce}
-    if container == nil then
-        Logging.LogPrint("Error: create '" .. containerDetails.entityName .. "' failed at position: " .. Utils.FormatPositionTableToString(crashSitePosition))
-        return
+function ShipCrash.CalculateDebris(parentType, crashSitePosition)
+    local debrisPieces = {}
+    if parentType.debris == nil then
+        return debrisPieces
     end
-    container.operable = false
+    local minRadius = parentType.container.killRadius - (parentType.container.killRadius * 0.25)
+    local maxRadius = parentType.container.killRadius + (parentType.container.killRadius * 0.25)
+    for debrisSize, debrisCount in pairs(parentType.debris) do
+        local debrisType = DebrisTypes[debrisSize]
+        for i = 1, math.random(debrisCount - 1, debrisCount + 1) do
+            table.insert(
+                debrisPieces,
+                {
+                    debrisType = debrisType,
+                    position = Utils.RandomLocationInRadius(crashSitePosition, minRadius, maxRadius)
+                }
+            )
+        end
+    end
+    return debrisPieces
+end
+
+function ShipCrash.CreateDebris(debrisType, surface, position, playerForce)
+    surface.create_entity {name = debrisType.entityName, position = position, force = playerForce}
+    ShipCrash.CreateCraterImpact(debrisType.craterName, debrisType.rocks, debrisType.killRadius, surface, position)
+    surface.create_entity {name = "item_delivery_pod-debris_fire_flame", position = position, initial_ground_flame_count = 10}
+end
+
+function ShipCrash.CreateContainer(containerDetails, surface, position, contents, playerForce)
+    local containerEntity = surface.create_entity {name = containerDetails.entityName, position = position, force = playerForce}
+    containerEntity.operable = false
+    containerEntity.destructible = false
     if contents ~= nil then
         for itemName, count in pairs(contents) do
             if count > 0 then
-                container.get_inventory(defines.inventory.chest).insert({name = itemName, count = count})
+                containerEntity.get_inventory(defines.inventory.chest).insert({name = itemName, count = count})
             end
         end
     end
-    ShipCrash.CreateCraterImpact(containerDetails.craterName, containerDetails.rocks, containerDetails.killRadius, surface, crashSitePosition)
+    ShipCrash.CreateCraterImpact(containerDetails.craterName, containerDetails.rocks, containerDetails.killRadius, surface, position)
+    --TODO: create some fire around the container
 end
 
 function ShipCrash.CreateCraterImpact(craterName, rocks, radius, surface, craterPosition)
@@ -168,12 +123,6 @@ function ShipCrash.PlaceRocksRandomlyWithinRadius(rockCount, rockEntityNames, su
     end
 end
 
-function ShipCrash.KillAllInCraterImpact(radius, surface, position)
-    for _, entity in pairs(surface.find_entities_filtered {position = position, radius = radius}) do
-        entity.die()
-    end
-end
-
 function ShipCrash.ValidateCallData(target, radius, crashTypeName, contents)
     local targetPos
     if type(target) == "string" then
@@ -197,9 +146,9 @@ function ShipCrash.ValidateCallData(target, radius, crashTypeName, contents)
         Logging.LogPrint("Error: call_crash_ship invalid radius positive number value: " .. tostring(radius))
         return
     end
-    local crashType = ShipCrash.crashTypes[crashTypeName]
+    local crashType = CrashTypes[crashTypeName]
     if crashType == nil then
-        for _, thisCrashType in pairs(ShipCrash.crashTypes) do
+        for _, thisCrashType in pairs(CrashTypes) do
             if thisCrashType.hasTypeValue == true then
                 if string.find(crashTypeName, thisCrashType.name) ~= nil then
                     crashType = thisCrashType
