@@ -25,7 +25,7 @@ return {
             entityName = "item_delivery_pod-small_wrecked_ship_container",
             craterName = "item_delivery_pod-large_scorchmark",
             explosionName = "item_delivery_pod-small_wrecked_ship_container_explosion",
-            killRadius = 3,
+            killRadius = 2.5,
             rocks = {
                 medium = 7,
                 small = 30,
@@ -45,7 +45,7 @@ return {
             entityName = "item_delivery_pod-medium_wrecked_ship_container",
             craterName = "item_delivery_pod-large_scorchmark",
             explosionName = "item_delivery_pod-medium_wrecked_ship_container_explosion",
-            killRadius = 4,
+            killRadius = 3,
             rocks = {
                 medium = 15,
                 small = 50,
@@ -65,7 +65,7 @@ return {
             entityName = "item_delivery_pod-large_wrecked_ship_container",
             craterName = "item_delivery_pod-massive_scorchmark",
             explosionName = "item_delivery_pod-large_wrecked_ship_container_explosion",
-            killRadius = 5,
+            killRadius = 4,
             rocks = {
                 medium = 30,
                 small = 100,

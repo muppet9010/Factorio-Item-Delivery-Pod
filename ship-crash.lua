@@ -50,7 +50,7 @@ function ShipCrash.CallCrashShip(target, radius, crashTypeName, contents)
     local playerForce = game.forces[1]
 
     if crashType.hasTypeValue == false then
-        local crashSitePosition = Utils.GetValidPositionForEntityNearPosition(crashType.container.placementTestEntityName, surface, Utils.RandomLocationInRadius(targetPos, radius), 10, 5)
+        local crashSitePosition = Utils.GetValidPositionForEntityNearPosition(crashType.container.placementTestEntityName, surface, Utils.RandomLocationInRadius(targetPos, radius), 10, 5, 0.2, true)
         ShipCrash.StartCrashShipFalling(crashType, crashSitePosition, surface, playerForce, contents)
     else
         --TODO
@@ -150,8 +150,8 @@ function ShipCrash.CalculateDebrisPieces(parentType, crashSitePosition, surface)
     if parentType.debris == nil then
         return debrisPieces
     end
-    local minRadius = parentType.container.killRadius - (parentType.container.killRadius * 0.25)
-    local maxRadius = parentType.container.killRadius + (parentType.container.killRadius * 0.25)
+    local minRadius = parentType.container.killRadius
+    local maxRadius = parentType.container.killRadius + (parentType.container.killRadius * 0.5)
     for debrisSize, debrisCount in pairs(parentType.debris) do
         local debrisType = DebrisTypes[debrisSize]
         local totalDebrisCount = math.random(debrisCount - 1, debrisCount + 1)
