@@ -3,7 +3,6 @@ local Commands = require("utility/commands")
 local Utils = require("utility/utils")
 local Logging = require("utility/logging")
 local CrashTypes = require("static-data/crash-types")
-local DebrisTypes = require("static-data/debris-types")
 local EventScheduler = require("utility/event-scheduler")
 local FireTypes = require("static-data/fire-types")
 
@@ -75,7 +74,7 @@ function ShipCrash.StartCrashShipFalling(crashType, crashSitePosition, surface, 
     data = ShipCrash.UpdateShipShadowData(data)
     data.shadowRenderId =
         rendering.draw_sprite {
-        sprite = "item_delivery_pod-generic_wreck_sprite",
+        sprite = "item_delivery_pod-generic_falling_shadow",
         target = data.shadowPos,
         surface = data.surface,
         x_scale = data.shadowScale,
@@ -147,34 +146,33 @@ end
 
 function ShipCrash.CalculateDebrisPieces(parentType, crashSitePosition, surface)
     local debrisPieces = {}
-    if parentType.debris == nil then
+    if parentType.debris == nil or parentType.debris == 0 then
         return debrisPieces
     end
     local minRadius = parentType.container.killRadius
     local maxRadius = parentType.container.killRadius + (parentType.container.killRadius * 0.5)
-    for debrisSize, debrisCount in pairs(parentType.debris) do
-        local debrisType = DebrisTypes[debrisSize]
-        local totalDebrisCount = math.random(debrisCount - 1, debrisCount + 1)
-        for i = 1, totalDebrisCount do
-            local pos
-            local attempts = 0
-            while pos == nil do
-                attempts = attempts + 1
-                pos = Utils.GetValidPositionForEntityNearPosition(debrisType.placementTestEntityName, surface, Utils.RandomLocationInRadius(crashSitePosition, minRadius, maxRadius), 2, 1, 0.2, true)
-                if pos ~= nil then
-                    if attempts > 100 then
+
+    local debrisType = CrashTypes.debris
+    local totalDebrisCount = math.random(parentType.debris - 1, parentType.debris + 1)
+    for i = 1, totalDebrisCount do
+        local pos
+        local attempts = 0
+        while pos == nil do
+            attempts = attempts + 1
+            pos = Utils.GetValidPositionForEntityNearPosition(debrisType.placementTestEntityName, surface, Utils.RandomLocationInRadius(crashSitePosition, minRadius, maxRadius), 2, 1, 0.2, true)
+            if pos ~= nil then
+                if attempts > 100 then
+                    break
+                end
+                for _, otherDebrisPiece in ipairs(debrisPieces) do
+                    if Utils.GetDistance(pos, otherDebrisPiece.position) < 3 then
+                        pos = nil
                         break
-                    end
-                    for _, otherDebrisPiece in ipairs(debrisPieces) do
-                        if Utils.GetDistance(pos, otherDebrisPiece.position) < 3 then
-                            pos = nil
-                            break
-                        end
                     end
                 end
             end
-            table.insert(debrisPieces, {debrisType = debrisType, position = pos})
         end
+        table.insert(debrisPieces, {debrisType = debrisType, position = pos})
     end
     return debrisPieces
 end

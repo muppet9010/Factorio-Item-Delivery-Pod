@@ -142,7 +142,7 @@ data:extend(
             icon = Constants.AssetModName .. "/graphics/icons/modular_bridge_wrecked_ship_container.png",
             icon_size = 32,
             minable = {mining_time = 1},
-            max_health = 100,
+            max_health = 50,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
             resistances = {
                 {
@@ -176,7 +176,7 @@ data:extend(
             icon = Constants.AssetModName .. "/graphics/icons/modular_thruster_wrecked_ship_container.png",
             icon_size = 32,
             minable = {mining_time = 1},
-            max_health = 100,
+            max_health = 50,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
             resistances = {
                 {
@@ -201,10 +201,44 @@ data:extend(
             height = 85
         },
         {
-            type = "simple-entity",
-            name = "item_delivery_pod-small_debris",
+            type = "container",
+            name = "item_delivery_pod-modular_hull_wrecked_ship_container",
+            localised_name = {"item_delivery_pod-modular_wrecked_ship_container"},
             order = "zzz-wrecked_ship-7",
-            icon = Constants.AssetModName .. "/graphics/icons/small_debris.png",
+            icon = Constants.AssetModName .. "/graphics/icons/modular_hull_wrecked_ship_container.png",
+            icon_size = 32,
+            minable = {mining_time = 1},
+            max_health = 50,
+            flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
+            resistances = {
+                {
+                    type = "fire",
+                    percent = 100
+                }
+            },
+            collision_box = {{-0.7, -0.7}, {0.7, 0.7}},
+            selection_box = {{-1.3, -1.1}, {1.3, 1.1}},
+            picture = {
+                filename = "__base__/graphics/entity/ship-wreck/small-ship-wreck-d.png",
+                width = 82,
+                height = 67,
+                shift = {0.15, 0.4},
+                scale = 1.5
+            },
+            inventory_size = 999
+        },
+        {
+            type = "sprite",
+            name = "item_delivery_pod-modular_hull_wrecked_ship_container_falling",
+            filename = Constants.AssetModName .. "/graphics/entities/modular_hull_wrecked_ship_container_falling.png",
+            width = 78,
+            height = 75
+        },
+        {
+            type = "simple-entity",
+            name = "item_delivery_pod-debris",
+            order = "zzz-wrecked_ship-7",
+            icon = Constants.AssetModName .. "/graphics/icons/debris.png",
             icon_size = 32,
             minable = {mining_time = 0.1},
             max_health = 20,
@@ -219,10 +253,31 @@ data:extend(
             selection_box = {{-1.3, -1.1}, {1.3, 1.1}},
             pictures = {
                 {
+                    filename = "__base__/graphics/entity/ship-wreck/small-ship-wreck-a.png",
+                    width = 65,
+                    height = 68,
+                    shift = {0, 0},
+                    scale = 0.8
+                },
+                {
+                    filename = "__base__/graphics/entity/ship-wreck/small-ship-wreck-b.png",
+                    width = 109,
+                    height = 67,
+                    shift = {0.3, 0},
+                    scale = 0.6
+                },
+                {
                     filename = "__base__/graphics/entity/ship-wreck/small-ship-wreck-c.png",
                     width = 63,
                     height = 54,
                     shift = {0, 0.3}
+                },
+                {
+                    filename = "__base__/graphics/entity/ship-wreck/small-ship-wreck-e.png",
+                    width = 78,
+                    height = 75,
+                    shift = {0.1, -0.15},
+                    scale = 0.75
                 },
                 {
                     filename = "__base__/graphics/entity/ship-wreck/small-ship-wreck-f.png",
@@ -235,51 +290,6 @@ data:extend(
                     width = 79,
                     height = 54,
                     shift = {0.25, -0.15}
-                }
-            },
-            render_layer = "object"
-        },
-        {
-            type = "simple-entity",
-            name = "item_delivery_pod-medium_debris",
-            order = "zzz-wrecked_ship-8",
-            icon = Constants.AssetModName .. "/graphics/icons/medium_debris.png",
-            icon_size = 32,
-            minable = {mining_time = 0.5},
-            max_health = 50,
-            flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
-            resistances = {
-                {
-                    type = "fire",
-                    percent = 100
-                }
-            },
-            collision_box = {{-0.7, -0.7}, {0.7, 0.7}},
-            selection_box = {{-1.3, -1.1}, {1.3, 1.1}},
-            pictures = {
-                {
-                    filename = "__base__/graphics/entity/ship-wreck/small-ship-wreck-a.png",
-                    width = 65,
-                    height = 68,
-                    shift = {0, 0}
-                },
-                {
-                    filename = "__base__/graphics/entity/ship-wreck/small-ship-wreck-b.png",
-                    width = 109,
-                    height = 67,
-                    shift = {0.5, 0}
-                },
-                {
-                    filename = "__base__/graphics/entity/ship-wreck/small-ship-wreck-d.png",
-                    width = 82,
-                    height = 67,
-                    shift = {0.1, 0.25}
-                },
-                {
-                    filename = "__base__/graphics/entity/ship-wreck/small-ship-wreck-e.png",
-                    width = 78,
-                    height = 75,
-                    shift = {0.4, -0.2}
                 },
                 {
                     filename = "__base__/graphics/entity/ship-wreck/small-ship-wreck-i.png",
@@ -292,7 +302,7 @@ data:extend(
         },
         {
             type = "sprite",
-            name = "item_delivery_pod-generic_wreck_sprite",
+            name = "item_delivery_pod-generic_falling_shadow",
             filename = Constants.AssetModName .. "/graphics/entities/generic_falling_shadow.png",
             width = 256,
             height = 256,

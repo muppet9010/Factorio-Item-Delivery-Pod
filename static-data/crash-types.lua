@@ -16,7 +16,7 @@ return {
             explosionEffectName = "medium-explosion",
             placementTestEntityName = "item_delivery_pod-small_wrecked_ship_container_placement_test"
         },
-        debris = nil
+        debris = 0
     },
     small = {
         name = "small",
@@ -36,7 +36,7 @@ return {
             explosionEffectName = "massive-explosion",
             placementTestEntityName = "item_delivery_pod-small_wrecked_ship_container_placement_test"
         },
-        debris = nil
+        debris = 0
     },
     medium = {
         name = "medium",
@@ -56,7 +56,7 @@ return {
             explosionEffectName = "massive-explosion",
             placementTestEntityName = "item_delivery_pod-large_wrecked_ship_container_placement_test"
         },
-        debris = {small = 3}
+        debris = 3
     },
     large = {
         name = "large",
@@ -76,7 +76,23 @@ return {
             explosionEffectName = "massive-explosion",
             placementTestEntityName = "item_delivery_pod-large_wrecked_ship_container_placement_test"
         },
-        debris = {small = 5}
+        debris = 5
+    },
+    debris = {
+        name = "debris",
+        entityName = "item_delivery_pod-debris",
+        craterName = "small-scorchmark",
+        explosionName = "item_delivery_pod-debris_explosion",
+        killRadius = 1,
+        rocks = {
+            small = 3,
+            tiny = 10
+        },
+        shadowSize = 1.5,
+        explosionSmokeName = "item_delivery_pod-small_crash_smoke",
+        explosionEffectName = "medium-explosion",
+        placementTestEntityName = "item_delivery_pod-small_wrecked_ship_container_placement_test",
+        debris = 0
     },
     modular = {
         name = "modular",
