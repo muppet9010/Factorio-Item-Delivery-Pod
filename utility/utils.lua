@@ -664,9 +664,15 @@ function Utils.CreateLandPlacementTestEntityPrototype(entityToClone, newEntityNa
                 scale = (clonedIconSize / 64) * 0.75
             }
         },
+        flags = entityToClone.flags,
+        selection_box = entityToClone.selection_box,
         collision_box = entityToClone.collision_box,
         collision_mask = {"water-tile", "colliding-with-tiles-only"},
-        picture = data.raw["container"]["wooden-chest"].picture
+        picture = {
+            filename = "__core__/graphics/cancel.png",
+            height = 64,
+            width = 64
+        }
     }
 end
 
