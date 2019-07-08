@@ -7,6 +7,7 @@ local EventScheduler = require("utility/event-scheduler")
 local FireTypes = require("static-data/fire-types")
 
 --[[TODO:
+    Add modular wrecks in.
     Have effects and graphics for if it crashes in to water. Allow ship parts to be entirely in or out of water.
     Add the start of the rocket launch sound to an invisible entity that is at the falling ship position. Louder impact.
 	Add in flying text over the crashed ship of who's donation, type and value it is.
@@ -53,7 +54,6 @@ function ShipCrash.CallCrashShip(target, radius, crashTypeName, contents)
         local crashSitePosition = Utils.GetValidPositionForEntityNearPosition(crashType.container.placementTestEntityName, surface, Utils.RandomLocationInRadius(targetPos, radius), 10, 5, 0.2, true)
         ShipCrash.StartCrashShipFalling(crashType, crashSitePosition, surface, playerForce, contents)
     else
-        --TODO
         game.print("MODULAR CRASH NOT CODED YET: " .. typeValue)
     end
 end
@@ -235,7 +235,7 @@ function ShipCrash.CreateCraterImpact(craterName, rocks, radius, surface, crater
 end
 
 function ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosition, minRadius, maxRadius)
-    fireCount = math.random(math.floor(fireCount * 0.75), math.floor(fireCount * 1.5))
+    fireCount = math.random(math.floor(fireCount * 0.75), math.floor(fireCount * 1.25))
     for i = 1, fireCount do
         local pos = Utils.RandomLocationInRadius(craterPosition, minRadius, maxRadius)
         if not surface.get_tile(pos.x, pos.y).collides_with("water-tile") then
