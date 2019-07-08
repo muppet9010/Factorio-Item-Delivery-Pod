@@ -15,6 +15,7 @@ data:extend(
                 priority = "high",
                 animation_speed = 0.25,
                 flags = {"smoke"},
+                tint = {r = 0.74, g = 0.67, b = 0.52, a = 1},
                 shift = {-0.5, -0.5},
                 scale = 1.5
             },
@@ -40,6 +41,7 @@ data:extend(
                 priority = "high",
                 animation_speed = 0.25,
                 flags = {"smoke"},
+                tint = {r = 0.74, g = 0.67, b = 0.52, a = 1},
                 shift = {-1, -1},
                 scale = 3
             },
@@ -65,6 +67,7 @@ data:extend(
                 priority = "high",
                 animation_speed = 0.25,
                 flags = {"smoke"},
+                tint = {r = 0.74, g = 0.67, b = 0.52, a = 1},
                 shift = {-2, -2},
                 scale = 6
             },
@@ -90,6 +93,7 @@ data:extend(
                 priority = "high",
                 animation_speed = 0.25,
                 flags = {"smoke"},
+                tint = {r = 0.74, g = 0.67, b = 0.52, a = 1},
                 shift = {-3, -3},
                 scale = 9
             },

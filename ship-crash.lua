@@ -8,7 +8,8 @@ local FireTypes = require("static-data/fire-types")
 
 --[[TODO:
     Have effects and graphics for if it crashes in to water. Allow ship parts to be entirely in or out of water.
-    Add the start of the rocket launch sound to an invisible entity that is at the falling ship position.
+    Add the start of the rocket launch sound to an invisible entity that is at the falling ship position. Louder impact.
+	Add in flying text over the crashed ship of who's donation, type and value it is.
 ]]
 ShipCrash.fallingTicks = 60 * 5
 ShipCrash.fallingStartHeight = 500
@@ -180,7 +181,7 @@ end
 function ShipCrash.CreateDebris(debrisType, surface, position, playerForce)
     surface.create_entity {name = debrisType.entityName, position = position, force = playerForce}
     ShipCrash.CreateCraterImpact(debrisType.craterName, debrisType.rocks, debrisType.killRadius, surface, position)
-    ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, 5, 10)
+    ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, 7, 15)
     surface.create_entity {name = debrisType.explosionEffectName, position = position}
 end
 
@@ -200,6 +201,9 @@ function ShipCrash.CreateContainer(containerDetails, surface, position, contents
 end
 
 function ShipCrash.CreateCraterImpact(craterName, rocks, radius, surface, craterPosition)
+    local rockDecoratives = {"rock-medium", "rock-small", "rock-tiny", "sand-rock-medium", "sand-rock-small"}
+    local killDecorativesArea = Utils.CalculateBoundingBoxFromPositionAndRange(craterPosition, radius)
+    surface.destroy_decoratives {area = killDecorativesArea, name = rockDecoratives, invert = true}
     surface.create_entity {name = craterName, position = craterPosition}
     for rockSize, rockCount in pairs(rocks) do
         if rockSize == "medium" then
@@ -221,8 +225,12 @@ function ShipCrash.CreateCraterImpact(craterName, rocks, radius, surface, crater
     end
 
     local fireMinRadius = radius * 0.25
-    local fireMaxRadius = radius * 1.25
-    local fireCount = math.ceil(math.sqrt(rocks["small"]) * 1.5)
+    local fireMaxRadius = radius * 1
+    local fireCount = math.ceil(math.sqrt(rocks["small"]))
+    ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosition, fireMinRadius, fireMaxRadius)
+    fireMinRadius = radius * 1.25
+    fireMaxRadius = radius * 2
+    fireCount = math.ceil(math.sqrt(rocks["small"]))
     ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosition, fireMinRadius, fireMaxRadius)
 end
 
@@ -231,7 +239,7 @@ function ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosit
     for i = 1, fireCount do
         local pos = Utils.RandomLocationInRadius(craterPosition, minRadius, maxRadius)
         if not surface.get_tile(pos.x, pos.y).collides_with("water-tile") then
-            ShipCrash.CreateRandomLengthFire(math.random(1, 2), surface, pos, 4, 7)
+            ShipCrash.CreateRandomLengthFire(math.random(1, 2), surface, pos, 4, 8)
         end
     end
 end
@@ -291,6 +299,10 @@ function ShipCrash.ValidateCallData(target, radius, crashTypeName, contents)
     end
     if type(radius) ~= "number" or radius < 0 then
         Logging.LogPrint("Error: call_crash_ship invalid radius positive number value: " .. tostring(radius))
+        return
+    end
+    if type(crashTypeName) ~= "string" then
+        Logging.LogPrint("Error: call_crash_ship invalid ship value type: " .. tostring(crashTypeName))
         return
     end
     local crashType = CrashTypes[crashTypeName]

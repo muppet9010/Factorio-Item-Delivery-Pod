@@ -44,13 +44,27 @@ local function GenerateExplosions(name, radius, explosionSmokeName)
                     },
                     {
                         type = "area",
+                        radius = radius + (radius * 0.25),
+                        action_delivery = {
+                            type = "instant",
+                            target_effects = {
+                                type = "damage",
+                                damage = {
+                                    amount = 100,
+                                    type = "explosion"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        type = "area",
                         radius = radius + (radius * 0.5),
                         action_delivery = {
                             type = "instant",
                             target_effects = {
                                 type = "damage",
                                 damage = {
-                                    amount = 199,
+                                    amount = 50,
                                     type = "explosion"
                                 }
                             }

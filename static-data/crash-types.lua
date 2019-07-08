@@ -6,7 +6,7 @@ return {
             entityName = "item_delivery_pod-tiny_wrecked_ship_container",
             craterName = "item_delivery_pod-medium_scorchmark",
             explosionName = "item_delivery_pod-tiny_wrecked_ship_container_explosion",
-            killRadius = 1.5,
+            killRadius = 1,
             rocks = {
                 small = 10,
                 tiny = 20
