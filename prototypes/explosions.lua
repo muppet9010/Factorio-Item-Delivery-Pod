@@ -7,6 +7,7 @@ local function GenerateExplosions(name, radius, explosionSmokeName)
             {
                 type = "explosion",
                 name = name,
+                subgroup = "item_delivery_pod-effects",
                 animations = {
                     filename = "__core__/graphics/empty.png",
                     width = 1,

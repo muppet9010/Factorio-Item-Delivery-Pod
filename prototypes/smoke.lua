@@ -5,6 +5,7 @@ data:extend(
         {
             type = "trivial-smoke",
             name = "item_delivery_pod-small_crash_smoke",
+            subgroup = "item_delivery_pod-effects",
             animation = {
                 filename = Constants.AssetModName .. "/graphics/entities/large-smoke-white.png",
                 width = 152,

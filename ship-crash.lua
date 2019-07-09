@@ -8,7 +8,7 @@ local FireTypes = require("static-data/fire-types")
 
 --[[TODO:
     Add modular wrecks in.
-    Have effects and graphics for if it crashes in to water. Allow ship parts to be entirely in or out of water.
+    Have effects and graphics for if it crashes in to water.
     Add the start of the rocket launch sound to an invisible entity that is at the falling ship position. Louder impact.
 	Add in flying text over the crashed ship of who's donation, type and value it is.
 ]]
@@ -51,7 +51,7 @@ function ShipCrash.CallCrashShip(target, radius, crashTypeName, contents)
     local playerForce = game.forces[1]
 
     if crashType.hasTypeValue == false then
-        local crashSitePosition = Utils.GetValidPositionForEntityNearPosition(crashType.container.placementTestEntityName, surface, Utils.RandomLocationInRadius(targetPos, radius), 10, 5, 0.2, true)
+        local crashSitePosition = ShipCrash.FindLandWaterPositionNearTarget(targetPos, surface, Utils.RandomLocationInRadius(targetPos, radius), crashType.container.landPlacementTestEntityName, crashType.container.waterPlacementTestEntityName, 10, 5)
         ShipCrash.StartCrashShipFalling(crashType, crashSitePosition, surface, playerForce, contents)
     else
         game.print("MODULAR CRASH NOT CODED YET: " .. typeValue)
@@ -160,7 +160,7 @@ function ShipCrash.CalculateDebrisPieces(parentType, crashSitePosition, surface)
         local attempts = 0
         while pos == nil do
             attempts = attempts + 1
-            pos = Utils.GetValidPositionForEntityNearPosition(debrisType.placementTestEntityName, surface, Utils.RandomLocationInRadius(crashSitePosition, minRadius, maxRadius), 2, 1, 0.2, true)
+            pos = ShipCrash.FindLandWaterPositionNearTarget(crashSitePosition, surface, Utils.RandomLocationInRadius(crashSitePosition, minRadius, maxRadius), debrisType.landPlacementTestEntityName, debrisType.waterPlacementTestEntityName, 2, 1)
             if pos ~= nil then
                 if attempts > 100 then
                     break
@@ -176,6 +176,24 @@ function ShipCrash.CalculateDebrisPieces(parentType, crashSitePosition, surface)
         table.insert(debrisPieces, {debrisType = debrisType, position = pos})
     end
     return debrisPieces
+end
+
+function ShipCrash.FindLandWaterPositionNearTarget(parentPos, surface, testPos, landEntityName, waterEntityName, accuracy, attempts)
+    local landPos = Utils.GetValidPositionForEntityNearPosition(landEntityName, surface, testPos, accuracy, attempts, 0.2, true)
+    local waterPos = Utils.GetValidPositionForEntityNearPosition(waterEntityName, surface, testPos, accuracy, attempts, 0.2, true)
+    if landPos ~= nil and waterPos ~= nil then
+        if Utils.GetDistance(landPos, parentPos) <= Utils.GetDistance(waterPos, parentPos) then
+            return landPos
+        else
+            return waterPos
+        end
+    elseif landPos ~= nil then
+        return landPos
+    elseif waterPos ~= nil then
+        return waterPos
+    else
+        return nil
+    end
 end
 
 function ShipCrash.CreateDebris(debrisType, surface, position, playerForce)
@@ -204,7 +222,9 @@ function ShipCrash.CreateCraterImpact(craterName, rocks, radius, surface, crater
     local rockDecoratives = {"rock-medium", "rock-small", "rock-tiny", "sand-rock-medium", "sand-rock-small"}
     local killDecorativesArea = Utils.CalculateBoundingBoxFromPositionAndRange(craterPosition, radius)
     surface.destroy_decoratives {area = killDecorativesArea, name = rockDecoratives, invert = true}
-    surface.create_entity {name = craterName, position = craterPosition}
+    if not surface.get_tile(craterPosition.x, craterPosition.y).collides_with("water-tile") then
+        surface.create_entity {name = craterName, position = craterPosition}
+    end
     for rockSize, rockCount in pairs(rocks) do
         if rockSize == "medium" then
             local minRadius = radius / 2

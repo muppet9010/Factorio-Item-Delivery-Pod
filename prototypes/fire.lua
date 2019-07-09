@@ -6,6 +6,7 @@ local fireFlameOnTree = data.raw["fire"]["fire-flame-on-tree"]
 local function GenerateFireType(entityName, initialLifetime)
     local fireEntity = Utils.DeepCopy(fireFlame)
     fireEntity.name = entityName
+    fireEntity.subgroup = "item_delivery_pod-effects"
     fireEntity.initial_lifetime = initialLifetime
     fireEntity.spread_delay = initialLifetime
     fireEntity.spread_delay_deviation = 2
