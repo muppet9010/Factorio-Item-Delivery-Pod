@@ -7,8 +7,8 @@ local EventScheduler = require("utility/event-scheduler")
 local FireTypes = require("static-data/fire-types")
 
 --[[TODO:
-    Add modular wrecks in.
     Have effects and graphics for if it crashes in to water.
+    Have modular ships all do their explosion effects and then next tick all place their bits down. To avoid blowing up each others debris.
     Add the start of the rocket launch sound to an invisible entity that is at the falling ship position. Louder impact.
 	Add in flying text over the crashed ship of who's donation, type and value it is.
 ]]
@@ -52,25 +52,144 @@ function ShipCrash.CallCrashShip(target, radius, crashTypeName, contents)
 
     if crashType.hasTypeValue == false then
         local crashSitePosition = ShipCrash.FindLandWaterPositionNearTarget(targetPos, surface, Utils.RandomLocationInRadius(targetPos, radius), crashType.container.landPlacementTestEntityName, crashType.container.waterPlacementTestEntityName, 10, 5)
-        ShipCrash.StartCrashShipFalling(crashType, crashSitePosition, surface, playerForce, contents)
+        local debrisPieces = ShipCrash.CalculateDebrisPieces(crashType, crashSitePosition, surface)
+        ShipCrash.StartCrashShipFalling(crashType.container, crashSitePosition, surface, playerForce, contents, debrisPieces)
+        for _, debrisPiece in ipairs(debrisPieces) do
+            ShipCrash.StartCrashShipFalling(debrisPiece.debrisType, debrisPiece.position, surface, playerForce)
+        end
     else
-        game.print("MODULAR CRASH NOT CODED YET: " .. typeValue)
+        local crashSitePosition = Utils.RandomLocationInRadius(targetPos, radius)
+        local wreckPieces = Utils.CalculateModularShipWreckPieces(crashType, typeValue, crashSitePosition, surface)
+        local contentsToGo = Utils.DeepCopy(contents)
+        local contentsPerWreck = {}
+        for itemName, count in pairs(contents) do
+            contentsPerWreck[itemName] = math.ceil(count / #wreckPieces)
+        end
+        for _, wreckPiece in ipairs(wreckPieces) do
+            local thisContents = {}
+            for itemName, count in pairs(contentsPerWreck) do
+                thisContents[itemName] = math.min(count, contentsToGo[itemName])
+                contentsToGo[itemName] = contentsToGo[itemName] - thisContents[itemName]
+            end
+            local debrisPieces = ShipCrash.CalculateDebrisPieces(wreckPiece.wreckType, wreckPiece.position, surface)
+            ShipCrash.StartCrashShipFalling(wreckPiece.wreckType.container, wreckPiece.position, surface, playerForce, thisContents, debrisPieces)
+            for _, debrisPiece in ipairs(debrisPieces) do
+                ShipCrash.StartCrashShipFalling(debrisPiece.debrisType, debrisPiece.position, surface, playerForce)
+            end
+        end
     end
 end
 
-function ShipCrash.StartCrashShipFalling(crashType, crashSitePosition, surface, playerForce, contents)
+function Utils.CalculateModularShipWreckPieces(crashType, typeValue, crashSitePosition, surface)
+    local wrecksLeftToAdd = typeValue
+    local wreckPlacementGroups = {front = {}, middle = {}, back = {}}
+    local wreckPieces = {}
+    for _, partSpec in ipairs(crashType.parts) do
+        local count = 0
+        if partSpec.count ~= nil then
+            count = math.min(partSpec.count, wrecksLeftToAdd)
+        elseif partSpec.ratio ~= nil then
+            count = math.min(math.floor(typeValue * partSpec.ratio), wrecksLeftToAdd)
+        elseif partSpec.allRemaining ~= nil then
+            count = wrecksLeftToAdd
+        end
+        wrecksLeftToAdd = wrecksLeftToAdd - count
+        for i = 1, count do
+            table.insert(wreckPlacementGroups[partSpec.placementGroup], partSpec.name)
+        end
+    end
+
+    local wreckSpacing = crashType.partSpacing
+    local maxTotalFrontCount = #wreckPlacementGroups.front
+    local maxTotalMiddleCount = #wreckPlacementGroups.middle
+    local middleWidthCount = math.max(math.floor(math.sqrt(maxTotalMiddleCount) * 0.9), 1)
+    local maxTotalBackCount = #wreckPlacementGroups.back
+    local totalWidth = middleWidthCount * wreckSpacing
+    local middleRows = math.ceil(maxTotalMiddleCount / middleWidthCount)
+    local totalRows = 0
+    if maxTotalFrontCount > 0 then
+        totalRows = totalRows + 1
+    end
+    if middleRows > 0 then
+        totalRows = totalRows + middleRows
+    end
+    if maxTotalBackCount > 0 then
+        totalRows = totalRows + 1
+    end
+    crashSitePosition = Utils.ApplyOffsetToPosition(crashSitePosition, {x = 0 + ((totalRows * wreckSpacing) / 2), y = 0})
+    local lengthCounter = 0
+    local wreckPlacementRadius = 3
+
+    if maxTotalFrontCount > 0 then
+        local frontPieceWidth = (totalWidth / maxTotalFrontCount)
+        for currentRowFrontCount, wreckTypeName in ipairs(wreckPlacementGroups.front) do
+            local wreckType = CrashTypes[wreckTypeName]
+            local wreckTypeContainer = wreckType.container
+            local yOffset = 0 - (totalWidth / 2) + ((currentRowFrontCount - 1) * frontPieceWidth) + (frontPieceWidth / 2)
+            local xOffset = 0 - (lengthCounter * (wreckSpacing + 1)) - ((wreckSpacing + 1) / 2)
+            local targetPos = Utils.ApplyOffsetToPosition(crashSitePosition, {x = xOffset, y = yOffset})
+            local pos = ShipCrash.FindLandWaterPositionNearTarget(targetPos, surface, Utils.RandomLocationInRadius(targetPos, 0, 2), wreckTypeContainer.landPlacementTestEntityName, wreckTypeContainer.waterPlacementTestEntityName, wreckPlacementRadius, 1)
+            table.insert(wreckPieces, {wreckType = wreckType, position = pos})
+        end
+        lengthCounter = lengthCounter + 1
+    end
+
+    if maxTotalMiddleCount > 0 then
+        local currentTotalMiddleToDo = maxTotalMiddleCount
+        for i = 1, middleRows do
+            local maxRowMiddleCount = math.min(math.ceil(maxTotalMiddleCount / middleRows), currentTotalMiddleToDo)
+            if currentTotalMiddleToDo - maxRowMiddleCount == 1 then
+                maxRowMiddleCount = maxRowMiddleCount + 1
+            end
+            if maxRowMiddleCount > 0 then
+                local middlePieceWidth = (totalWidth / maxRowMiddleCount)
+                for currentRowMiddleCount = 1, maxRowMiddleCount do
+                    local wreckTypeName = wreckPlacementGroups.middle[currentTotalMiddleToDo]
+                    local wreckType = CrashTypes[wreckTypeName]
+                    local wreckTypeContainer = wreckType.container
+                    local yOffset = (0 - (totalWidth / 2)) + ((currentRowMiddleCount - 1) * middlePieceWidth) + (middlePieceWidth / 2)
+                    local xOffset = 0 - ((lengthCounter * wreckSpacing) + (wreckSpacing / 2))
+                    local targetPos = Utils.ApplyOffsetToPosition(crashSitePosition, {x = xOffset, y = yOffset})
+                    local pos = ShipCrash.FindLandWaterPositionNearTarget(targetPos, surface, Utils.RandomLocationInRadius(targetPos, 0, 2), wreckTypeContainer.landPlacementTestEntityName, wreckTypeContainer.waterPlacementTestEntityName, wreckPlacementRadius, 1)
+                    table.insert(wreckPieces, {wreckType = wreckType, position = pos})
+                    currentTotalMiddleToDo = currentTotalMiddleToDo - 1
+                end
+                lengthCounter = lengthCounter + 1
+            end
+        end
+    end
+
+    if maxTotalBackCount > 0 then
+        local backPieceWidth = (totalWidth / maxTotalBackCount)
+        for currentRowBackCount, wreckTypeName in ipairs(wreckPlacementGroups.back) do
+            local wreckType = CrashTypes[wreckTypeName]
+            local wreckTypeContainer = wreckType.container
+            local yOffset = 0 - (totalWidth / 2) + ((currentRowBackCount - 1) * backPieceWidth) + (backPieceWidth / 2)
+            local xOffset = 0 - (lengthCounter * wreckSpacing) - (wreckSpacing / 2)
+            local targetPos = Utils.ApplyOffsetToPosition(crashSitePosition, {x = xOffset, y = yOffset})
+            local pos = ShipCrash.FindLandWaterPositionNearTarget(targetPos, surface, Utils.RandomLocationInRadius(targetPos, 0, 2), wreckTypeContainer.landPlacementTestEntityName, wreckTypeContainer.waterPlacementTestEntityName, wreckPlacementRadius, 1)
+            table.insert(wreckPieces, {wreckType = wreckType, position = pos})
+        end
+    --lengthCounter = lengthCounter + 1
+    end
+
+    return wreckPieces
+end
+
+function ShipCrash.StartCrashShipFalling(wreckType, crashSitePosition, surface, playerForce, contents, debrisPieces)
     local data = {
         targetPos = crashSitePosition,
         surface = surface,
         playerForce = playerForce,
         contents = contents,
-        crashType = crashType,
+        wreckType = wreckType,
         ticksFallingCount = 0,
-        crashTypeShadowScale = crashType.container.shadowSize / 7,
+        wreckTypeShadowScale = wreckType.shadowSize / 7,
         shipRenderId = nil,
         shadowRenderId = nil,
         shadowScale = 0,
-        shipScale = 0
+        shipScale = 0,
+        debrisPieces = debrisPieces
     }
     data = ShipCrash.UpdateShipShadowData(data)
     data.shadowRenderId =
@@ -90,7 +209,9 @@ function ShipCrash.UpdateFallingShipScheduledEvent(event)
     if data.ticksFallingCount > ShipCrash.fallingTicks then
         rendering.destroy(data.shadowRenderId)
         rendering.destroy(data.shipRenderId)
-        ShipCrash.SpawnCrashShipOnGround(data.crashType, data.targetPos, data.surface, data.playerForce, data.contents)
+        if data.debrisPieces ~= nil then
+            ShipCrash.SpawnCrashShipOnGround(data.wreckType, data.targetPos, data.surface, data.playerForce, data.contents, data.debrisPieces)
+        end
         return
     end
 
@@ -98,7 +219,7 @@ function ShipCrash.UpdateFallingShipScheduledEvent(event)
     if data.shipRenderId == nil and data.currentHeight <= ShipCrash.shipCreateHeight then
         data.shipRenderId =
             rendering.draw_sprite {
-            sprite = data.crashType.container.entityName .. "_falling",
+            sprite = data.wreckType.entityName .. "_falling",
             target = data.shipPos,
             surface = data.surface,
             x_scale = data.shipScale,
@@ -122,7 +243,7 @@ function ShipCrash.UpdateShipShadowData(data)
     data.shadowPos = ShipCrash.CalculateShadowForShip(data.shipPos, data.currentHeight)
     local imageScale = ShipCrash.startingImageScale + (ShipCrash.imageScaleChangePerTick * data.ticksFallingCount)
     data.shipScale = imageScale
-    data.shadowScale = imageScale * data.crashTypeShadowScale
+    data.shadowScale = imageScale * data.wreckTypeShadowScale
     return data
 end
 
@@ -133,13 +254,12 @@ function ShipCrash.CalculateShadowForShip(shipPos, currentHeigt)
     }
 end
 
-function ShipCrash.SpawnCrashShipOnGround(crashType, crashSitePosition, surface, playerForce, contents)
-    surface.create_entity {name = crashType.container.explosionName, position = crashSitePosition}
-    local debrisPieces = ShipCrash.CalculateDebrisPieces(crashType, crashSitePosition, surface)
+function ShipCrash.SpawnCrashShipOnGround(wreckType, crashSitePosition, surface, playerForce, contents, debrisPieces)
+    surface.create_entity {name = wreckType.explosionName, position = crashSitePosition}
     for _, debrisPiece in ipairs(debrisPieces) do
         surface.create_entity {name = debrisPiece.debrisType.explosionName, position = debrisPiece.position}
     end
-    ShipCrash.CreateContainer(crashType.container, surface, crashSitePosition, contents, playerForce)
+    ShipCrash.CreateContainer(wreckType, surface, crashSitePosition, contents, playerForce)
     for _, debrisPiece in ipairs(debrisPieces) do
         ShipCrash.CreateDebris(debrisPiece.debrisType, surface, debrisPiece.position, playerForce)
     end

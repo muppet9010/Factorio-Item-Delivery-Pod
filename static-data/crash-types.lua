@@ -1,4 +1,4 @@
-return {
+local crashTypes = {
     tiny = {
         name = "tiny",
         hasTypeValue = false,
@@ -101,6 +101,43 @@ return {
     },
     modular = {
         name = "modular",
-        hasTypeValue = true
+        hasTypeValue = true,
+        parts = {
+            {name = "modular_bridge", placementGroup = "front", count = 1},
+            {name = "modular_thruster", placementGroup = "back", ratio = 1 / 6},
+            {name = "modular_hull", placementGroup = "middle", allRemaining = true}
+        },
+        partSpacing = 5
     }
 }
+
+local function CreateModularParts(name, entityName)
+    crashTypes[name] = {
+        name = name,
+        hasTypeValue = false,
+        container = {
+            entityName = entityName,
+            craterName = "item_delivery_pod-medium_scorchmark",
+            explosionName = entityName .. "_explosion",
+            killRadius = 2.5,
+            rocks = {
+                medium = 7,
+                small = 30,
+                tiny = 50
+            },
+            shadowSize = 3,
+            explosionSmokeName = "item_delivery_pod-medium_crash_smoke",
+            explosionEffectName = "massive-explosion",
+            landPlacementTestEntityName = "item_delivery_pod-medium_wrecked_ship_container_land_placement_test",
+            waterPlacementTestEntityName = "item_delivery_pod-medium_wrecked_ship_container_water_placement_test"
+        },
+        debris = 2
+    }
+end
+CreateModularParts("modular_bridge", "item_delivery_pod-modular_bridge_wrecked_ship_container")
+crashTypes["modular_bridge"].container.killRadius = 3
+crashTypes["modular_bridge"].debris = 5
+CreateModularParts("modular_thruster", "item_delivery_pod-modular_thruster_wrecked_ship_container")
+CreateModularParts("modular_hull", "item_delivery_pod-modular_hull_wrecked_ship_container")
+
+return crashTypes

@@ -171,7 +171,7 @@ data:extend(
             filename = Constants.AssetModName .. "/graphics/entities/modular_bridge_wrecked_ship_container_falling.png",
             width = 120,
             height = 85,
-            shift = {0.2, -0.2}
+            shift = {-1, -2}
         },
         {
             type = "container",
@@ -203,8 +203,9 @@ data:extend(
             type = "sprite",
             name = "item_delivery_pod-modular_thruster_wrecked_ship_container_falling",
             filename = Constants.AssetModName .. "/graphics/entities/modular_thruster_wrecked_ship_container_falling.png",
-            width = 120,
-            height = 85
+            width = 200,
+            height = 225,
+            shift = {-0.7, -1.7}
         },
         {
             type = "container",
@@ -238,8 +239,9 @@ data:extend(
             type = "sprite",
             name = "item_delivery_pod-modular_hull_wrecked_ship_container_falling",
             filename = Constants.AssetModName .. "/graphics/entities/modular_hull_wrecked_ship_container_falling.png",
-            width = 78,
-            height = 75
+            width = 147,
+            height = 176,
+            shift = {-0.5, -1.3}
         },
         {
             type = "simple-entity",
@@ -308,6 +310,19 @@ data:extend(
             },
             render_layer = "object"
         },
+        {
+            type = "sprite",
+            name = "item_delivery_pod-debris_falling",
+            filename = Constants.AssetModName .. "/graphics/entities/debris_falling.png",
+            width = 111,
+            height = 131,
+            shift = {-0.5, -0.5}
+        }
+    }
+)
+
+data:extend(
+    {
         {
             type = "sprite",
             name = "item_delivery_pod-generic_falling_shadow",

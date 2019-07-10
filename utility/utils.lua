@@ -162,6 +162,7 @@ function Utils.CalculateBoundingBoxFrom2Points(point1, point2)
 end
 
 function Utils.ApplyOffsetToPosition(position, offset)
+    position = Utils.DeepCopy(position)
     if offset == nil then
         return position
     end
