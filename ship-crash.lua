@@ -6,12 +6,6 @@ local CrashTypes = require("static-data/crash-types")
 local EventScheduler = require("utility/event-scheduler")
 local FireTypes = require("static-data/fire-types")
 
---[[TODO:
-    Have effects and graphics for if it crashes in to water.
-    Have modular ships all do their explosion effects and then next tick all place their bits down. To avoid blowing up each others debris.
-    Add the start of the rocket launch sound to an invisible entity that is at the falling ship position. Louder impact.
-	Add in flying text over the crashed ship of who's donation, type and value it is.
-]]
 ShipCrash.fallingTicks = 60 * 5
 ShipCrash.fallingStartHeight = 500
 ShipCrash.fallingTickSpeed = ShipCrash.fallingStartHeight / ShipCrash.fallingTicks
