@@ -1,4 +1,5 @@
 local Constants = require("constants")
+local Utils = require("utility/utils")
 
 data:extend(
     {
@@ -109,3 +110,8 @@ data:extend(
         }
     }
 )
+
+local debrisFireSmoke = Utils.DeepCopy(data.raw["trivial-smoke"]["fire-smoke-without-glow"])
+debrisFireSmoke.name = "item_delivery_pod-debris_fire_smoke"
+debrisFireSmoke.show_when_smoke_off = true
+data:extend({debrisFireSmoke})

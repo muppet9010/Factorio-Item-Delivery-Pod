@@ -12,6 +12,7 @@ local function GenerateFireType(entityName, initialLifetime)
     fireEntity.spread_delay_deviation = 2
     fireEntity.smoke_source_pictures = fireFlameOnTree.smoke_source_pictures
     fireEntity.smoke = fireFlameOnTree.smoke
+    fireEntity.smoke[1].name = "item_delivery_pod-debris_fire_smoke"
     fireEntity.smoke[1].frequency = fireEntity.smoke[1].frequency / 2
     fireEntity.smoke_fade_in_duration = fireFlameOnTree.smoke_fade_in_duration
     fireEntity.smoke_fade_out_duration = fireFlameOnTree.smoke_fade_out_duration

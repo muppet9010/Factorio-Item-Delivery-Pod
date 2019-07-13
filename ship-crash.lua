@@ -313,7 +313,7 @@ end
 function ShipCrash.CreateDebris(debrisType, surface, position, playerForce)
     surface.create_entity {name = debrisType.entityName, position = position, force = playerForce}
     ShipCrash.CreateCraterImpact(debrisType.craterName, debrisType.rocks, debrisType.killRadius, surface, position)
-    ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, 7, 15)
+    ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, 6, 10)
     surface.create_entity {name = debrisType.explosionEffectName, position = position}
 end
 
