@@ -360,11 +360,11 @@ function ShipCrash.CreateCraterImpact(craterName, rocks, radius, surface, crater
 
     local fireMinRadius = radius * 0.25
     local fireMaxRadius = radius * 1
-    local fireCount = math.ceil(math.sqrt(rocks["small"]))
+    local fireCount = math.floor(math.sqrt(rocks["small"]))
     ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosition, fireMinRadius, fireMaxRadius)
     fireMinRadius = radius * 1.25
     fireMaxRadius = radius * 2
-    fireCount = math.ceil(math.sqrt(rocks["small"]))
+    fireCount = math.floor(math.sqrt(rocks["small"]))
     ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosition, fireMinRadius, fireMaxRadius)
 end
 
