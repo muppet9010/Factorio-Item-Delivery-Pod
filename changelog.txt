@@ -1,9 +1,10 @@
 ---------------------------------------------------------------------------------------------------
 Version: 17.0.1
-Date: 2019-07-13
+Date: 2019-07-14
   Features:
+   - added water impact graphics and effects
   Changes:
-   - tweak smoke and fire effects slightly
+   - tweak smoke and fire effects, positions and quantity slightly
   Bugfixes:
   Info:
 ---------------------------------------------------------------------------------------------------

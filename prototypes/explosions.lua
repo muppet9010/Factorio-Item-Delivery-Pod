@@ -1,6 +1,6 @@
 local CrashTypes = require("static-data/crash-types")
 
-local function GenerateExplosions(name, radius, explosionSmokeName)
+local function GenerateExplosions(name, radius, impactSmokeName)
     local smokeDeviationRadius = radius * 1.5
     data:extend(
         {
@@ -23,7 +23,7 @@ local function GenerateExplosions(name, radius, explosionSmokeName)
                             target_effects = {
                                 {
                                     type = "create-trivial-smoke",
-                                    smoke_name = explosionSmokeName,
+                                    smoke_name = impactSmokeName,
                                     offset_deviation = {{-smokeDeviationRadius, -smokeDeviationRadius}, {smokeDeviationRadius, smokeDeviationRadius}}
                                 }
                             }
@@ -78,8 +78,10 @@ local function GenerateExplosions(name, radius, explosionSmokeName)
 end
 for _, crashType in pairs(CrashTypes) do
     if crashType.container ~= nil and crashType.container.killRadius ~= nil then
-        GenerateExplosions(crashType.container.explosionName, crashType.container.killRadius, crashType.container.explosionSmokeName)
+        GenerateExplosions(crashType.container.explosionName, crashType.container.killRadius, crashType.container.impactSmokeName)
+        GenerateExplosions(crashType.container.explosionName .. "_water", crashType.container.killRadius, crashType.container.impactSmokeName .. "_water")
     elseif crashType.killRadius ~= nil then
-        GenerateExplosions(crashType.explosionName, crashType.killRadius, crashType.explosionSmokeName)
+        GenerateExplosions(crashType.explosionName, crashType.killRadius, crashType.impactSmokeName)
+        GenerateExplosions(crashType.explosionName .. "_water", crashType.killRadius, crashType.impactSmokeName .. "_water")
     end
 end

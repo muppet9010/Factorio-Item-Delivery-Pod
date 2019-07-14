@@ -12,8 +12,8 @@ local crashTypes = {
                 tiny = 20
             },
             shadowSize = 2,
-            explosionSmokeName = "item_delivery_pod-medium_crash_smoke",
-            explosionEffectName = "medium-explosion",
+            impactSmokeName = "item_delivery_pod-medium_crash_smoke",
+            impactEffectName = "medium-explosion",
             landPlacementTestEntityName = "item_delivery_pod-tiny_wrecked_ship_container_land_placement_test",
             waterPlacementTestEntityName = "item_delivery_pod-tiny_wrecked_ship_container_water_placement_test"
         },
@@ -33,8 +33,8 @@ local crashTypes = {
                 tiny = 50
             },
             shadowSize = 4,
-            explosionSmokeName = "item_delivery_pod-large_crash_smoke",
-            explosionEffectName = "massive-explosion",
+            impactSmokeName = "item_delivery_pod-large_crash_smoke",
+            impactEffectName = "massive-explosion",
             landPlacementTestEntityName = "item_delivery_pod-medium_wrecked_ship_container_land_placement_test",
             waterPlacementTestEntityName = "item_delivery_pod-medium_wrecked_ship_container_water_placement_test"
         },
@@ -54,8 +54,8 @@ local crashTypes = {
                 tiny = 100
             },
             shadowSize = 5,
-            explosionSmokeName = "item_delivery_pod-large_crash_smoke",
-            explosionEffectName = "massive-explosion",
+            impactSmokeName = "item_delivery_pod-large_crash_smoke",
+            impactEffectName = "massive-explosion",
             landPlacementTestEntityName = "item_delivery_pod-medium_wrecked_ship_container_land_placement_test",
             waterPlacementTestEntityName = "item_delivery_pod-medium_wrecked_ship_container_water_placement_test"
         },
@@ -75,8 +75,8 @@ local crashTypes = {
                 tiny = 200
             },
             shadowSize = 6,
-            explosionSmokeName = "item_delivery_pod-massive_crash_smoke",
-            explosionEffectName = "massive-explosion",
+            impactSmokeName = "item_delivery_pod-massive_crash_smoke",
+            impactEffectName = "massive-explosion",
             landPlacementTestEntityName = "item_delivery_pod-large_wrecked_ship_container_land_placement_test",
             waterPlacementTestEntityName = "item_delivery_pod-large_wrecked_ship_container_water_placement_test"
         },
@@ -93,8 +93,8 @@ local crashTypes = {
             tiny = 10
         },
         shadowSize = 1.5,
-        explosionSmokeName = "item_delivery_pod-small_crash_smoke",
-        explosionEffectName = "medium-explosion",
+        impactSmokeName = "item_delivery_pod-small_crash_smoke",
+        impactEffectName = "medium-explosion",
         landPlacementTestEntityName = "item_delivery_pod-tiny_wrecked_ship_container_land_placement_test",
         waterPlacementTestEntityName = "item_delivery_pod-tiny_wrecked_ship_container_water_placement_test",
         debris = 0
@@ -126,8 +126,8 @@ local function CreateModularParts(name, entityName)
                 tiny = 50
             },
             shadowSize = 3,
-            explosionSmokeName = "item_delivery_pod-medium_crash_smoke",
-            explosionEffectName = "massive-explosion",
+            impactSmokeName = "item_delivery_pod-medium_crash_smoke",
+            impactEffectName = "massive-explosion",
             landPlacementTestEntityName = "item_delivery_pod-medium_wrecked_ship_container_land_placement_test",
             waterPlacementTestEntityName = "item_delivery_pod-medium_wrecked_ship_container_water_placement_test"
         },

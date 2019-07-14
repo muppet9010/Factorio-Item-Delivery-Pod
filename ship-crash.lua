@@ -249,9 +249,17 @@ function ShipCrash.CalculateShadowForShip(shipPos, currentHeigt)
 end
 
 function ShipCrash.SpawnCrashShipOnGround(wreckType, crashSitePosition, surface, playerForce, contents, debrisPieces)
-    surface.create_entity {name = wreckType.explosionName, position = crashSitePosition}
+    local wreckTypeExplosionName = wreckType.explosionName
+    if surface.get_tile(crashSitePosition.x, crashSitePosition.y).collides_with("water-tile") then
+        wreckTypeExplosionName = wreckTypeExplosionName .. "_water"
+    end
+    surface.create_entity {name = wreckTypeExplosionName, position = crashSitePosition}
     for _, debrisPiece in ipairs(debrisPieces) do
-        surface.create_entity {name = debrisPiece.debrisType.explosionName, position = debrisPiece.position}
+        local debrisTypeExplosionName = debrisPiece.debrisType.explosionName
+        if surface.get_tile(debrisPiece.position.x, debrisPiece.position.y).collides_with("water-tile") then
+            debrisTypeExplosionName = debrisTypeExplosionName .. "_water"
+        end
+        surface.create_entity {name = debrisTypeExplosionName, position = debrisPiece.position}
     end
     ShipCrash.CreateContainer(wreckType, surface, crashSitePosition, contents, playerForce)
     for _, debrisPiece in ipairs(debrisPieces) do
@@ -311,14 +319,26 @@ function ShipCrash.FindLandWaterPositionNearTarget(parentPos, surface, testPos, 
 end
 
 function ShipCrash.CreateDebris(debrisType, surface, position, playerForce)
-    surface.create_entity {name = debrisType.entityName, position = position, force = playerForce}
+    local debrisEntityName = debrisType.entityName
+    if surface.get_tile(position.x, position.y).collides_with("water-tile") then
+        debrisEntityName = debrisEntityName .. "_water"
+    end
+    surface.create_entity {name = debrisEntityName, position = position, force = playerForce}
     ShipCrash.CreateCraterImpact(debrisType.craterName, debrisType.rocks, debrisType.killRadius, surface, position)
-    ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, 6, 10)
-    surface.create_entity {name = debrisType.explosionEffectName, position = position}
+    if not surface.get_tile(position.x, position.y).collides_with("water-tile") then
+        ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, 6, 10)
+    else
+        ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, 6, 10, true)
+    end
+    surface.create_entity {name = debrisType.impactEffectName, position = position}
 end
 
 function ShipCrash.CreateContainer(containerDetails, surface, position, contents, playerForce)
-    local containerEntity = surface.create_entity {name = containerDetails.entityName, position = position, force = playerForce}
+    local containerEntityName = containerDetails.entityName
+    if surface.get_tile(position.x, position.y).collides_with("water-tile") then
+        containerEntityName = containerEntityName .. "_water"
+    end
+    local containerEntity = surface.create_entity {name = containerEntityName, position = position, force = playerForce}
     containerEntity.operable = false
     containerEntity.destructible = false
     if contents ~= nil then
@@ -329,7 +349,7 @@ function ShipCrash.CreateContainer(containerDetails, surface, position, contents
         end
     end
     ShipCrash.CreateCraterImpact(containerDetails.craterName, containerDetails.rocks, containerDetails.killRadius, surface, position)
-    surface.create_entity {name = containerDetails.explosionEffectName, position = position}
+    surface.create_entity {name = containerDetails.impactEffectName, position = position}
 end
 
 function ShipCrash.CreateCraterImpact(craterName, rocks, radius, surface, craterPosition)
@@ -358,32 +378,45 @@ function ShipCrash.CreateCraterImpact(craterName, rocks, radius, surface, crater
         end
     end
 
-    local fireMinRadius = radius * 0.25
-    local fireMaxRadius = radius * 1
-    local fireCount = math.floor(math.sqrt(rocks["small"]))
-    ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosition, fireMinRadius, fireMaxRadius)
-    fireMinRadius = radius * 1.25
-    fireMaxRadius = radius * 2
-    fireCount = math.floor(math.sqrt(rocks["small"]))
-    ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosition, fireMinRadius, fireMaxRadius)
+    if not surface.get_tile(craterPosition.x, craterPosition.y).collides_with("water-tile") then
+        local fireMinRadius = radius * 0.25
+        local fireMaxRadius = radius * 0.75
+        local fireCount = math.ceil(math.sqrt(rocks["small"]) / 2)
+        ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosition, fireMinRadius, fireMaxRadius)
+        fireMinRadius = radius * 1
+        fireMaxRadius = radius * 2
+        fireCount = math.floor(math.sqrt(rocks["small"]) * 1.5)
+        ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosition, fireMinRadius, fireMaxRadius)
+    else
+        local fireMinRadius = 0
+        local fireMaxRadius = radius * 0.5
+        local fireCount = math.ceil(math.sqrt(rocks["small"]) / 2)
+        ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosition, fireMinRadius, fireMaxRadius, true)
+    end
 end
 
-function ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosition, minRadius, maxRadius)
+function ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosition, minRadius, maxRadius, allowFireOnWater)
     fireCount = math.random(math.floor(fireCount * 0.75), math.floor(fireCount * 1.25))
     for i = 1, fireCount do
         local pos = Utils.RandomLocationInRadius(craterPosition, minRadius, maxRadius)
         if not surface.get_tile(pos.x, pos.y).collides_with("water-tile") then
             ShipCrash.CreateRandomLengthFire(math.random(1, 2), surface, pos, 4, 8)
+        elseif allowFireOnWater then
+            ShipCrash.CreateRandomLengthFire(math.random(1, 2), surface, pos, 4, 8, true)
         end
     end
 end
 
-function ShipCrash.CreateRandomLengthFire(fireCount, surface, position, minSecondsPerFlame, maxSecondsPerFlame)
-    surface.create_entity {name = "item_delivery_pod-debris_fire_flame", position = position, initial_ground_flame_count = fireCount}
+function ShipCrash.CreateRandomLengthFire(fireCount, surface, position, minSecondsPerFlame, maxSecondsPerFlame, fireOnWater)
+    local entityName = "item_delivery_pod-debris_fire_flame"
+    if fireOnWater then
+        entityName = "item_delivery_pod-debris_fire_flame_water"
+    end
+    surface.create_entity {name = entityName, position = position, initial_ground_flame_count = fireCount}
     local secondsPerFlame = math.random(minSecondsPerFlame, maxSecondsPerFlame)
     local flameInstanceId = global.ShipCrash.fireEntityInstanceId
     global.ShipCrash.fireEntityInstanceId = global.ShipCrash.fireEntityInstanceId + 1
-    EventScheduler.ScheduleEvent(game.tick + FireTypes["debris"].initialLifetime, "ShipCrash.RenewFireScheduledEvent", flameInstanceId, {fireCount = fireCount, surface = surface, position = position, secondsPerFlame = secondsPerFlame, currentBurnTime = 1})
+    EventScheduler.ScheduleEvent(game.tick + FireTypes["debris"].initialLifetime, "ShipCrash.RenewFireScheduledEvent", flameInstanceId, {fireCount = fireCount, surface = surface, position = position, secondsPerFlame = secondsPerFlame, currentBurnTime = 1, fireOnWater = fireOnWater})
 end
 
 function ShipCrash.RenewFireScheduledEvent(event)
@@ -397,7 +430,11 @@ function ShipCrash.RenewFireScheduledEvent(event)
     if data.fireCount <= 0 then
         return
     end
-    data.surface.create_entity {name = "item_delivery_pod-debris_fire_flame", position = data.position, initial_ground_flame_count = data.fireCount}
+    local entityName = "item_delivery_pod-debris_fire_flame"
+    if data.fireOnWater then
+        entityName = "item_delivery_pod-debris_fire_flame_water"
+    end
+    data.surface.create_entity {name = entityName, position = data.position, initial_ground_flame_count = data.fireCount}
     EventScheduler.ScheduleEvent(event.tick + FireTypes["debris"].initialLifetime, "ShipCrash.RenewFireScheduledEvent", event.instanceId, data)
 end
 
