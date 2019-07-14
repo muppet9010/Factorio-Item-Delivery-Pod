@@ -11,7 +11,6 @@ end
 
 local function OnStartup()
     CreateGlobals()
-
     OnLoad()
 end
 

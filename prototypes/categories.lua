@@ -17,9 +17,15 @@ data:extend(
         },
         {
             type = "item-subgroup",
-            name = "item_delivery_pod-effects",
+            name = "item_delivery_pod-wrecks_water",
             group = "item_delivery_pod",
             order = "b"
+        },
+        {
+            type = "item-subgroup",
+            name = "item_delivery_pod-effects",
+            group = "item_delivery_pod",
+            order = "c"
         }
     }
 )

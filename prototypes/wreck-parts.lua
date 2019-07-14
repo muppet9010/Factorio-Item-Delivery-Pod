@@ -10,6 +10,7 @@ data:extend(
             order = "wrecked_ship-1",
             icon = Constants.AssetModName .. "/graphics/icons/tiny_wrecked_ship_container.png",
             icon_size = 32,
+            collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
             minable = {mining_time = 0.5},
             max_health = 50,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
@@ -43,6 +44,7 @@ data:extend(
             order = "wrecked_ship-2",
             icon = Constants.AssetModName .. "/graphics/icons/small_wrecked_ship_container.png",
             icon_size = 32,
+            collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
             minable = {mining_time = 1},
             max_health = 100,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
@@ -77,6 +79,7 @@ data:extend(
             order = "wrecked_ship-3",
             icon = Constants.AssetModName .. "/graphics/icons/medium_wrecked_ship_container.png",
             icon_size = 32,
+            collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
             minable = {mining_time = 2},
             max_health = 200,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
@@ -111,6 +114,7 @@ data:extend(
             order = "wrecked_ship-4",
             icon = Constants.AssetModName .. "/graphics/icons/large_wrecked_ship_container.png",
             icon_size = 32,
+            collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
             minable = {mining_time = 4},
             max_health = 400,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
@@ -146,6 +150,7 @@ data:extend(
             order = "wrecked_ship-5",
             icon = Constants.AssetModName .. "/graphics/icons/modular_bridge_wrecked_ship_container.png",
             icon_size = 32,
+            collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
             minable = {mining_time = 1},
             max_health = 50,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
@@ -181,6 +186,7 @@ data:extend(
             order = "wrecked_ship-6",
             icon = Constants.AssetModName .. "/graphics/icons/modular_thruster_wrecked_ship_container.png",
             icon_size = 32,
+            collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
             minable = {mining_time = 1},
             max_health = 50,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
@@ -215,6 +221,7 @@ data:extend(
             order = "wrecked_ship-7",
             icon = Constants.AssetModName .. "/graphics/icons/modular_hull_wrecked_ship_container.png",
             icon_size = 32,
+            collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
             minable = {mining_time = 1},
             max_health = 50,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
@@ -250,6 +257,7 @@ data:extend(
             order = "wrecked_ship-8",
             icon = Constants.AssetModName .. "/graphics/icons/debris.png",
             icon_size = 32,
+            collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
             minable = {mining_time = 0.1},
             max_health = 20,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
@@ -344,3 +352,28 @@ data:extend(
         Utils.CreateWaterPlacementTestEntityPrototype(data.raw["container"]["item_delivery_pod-large_wrecked_ship_container"], "item_delivery_pod-large_wrecked_ship_container_water_placement_test", "item_delivery_pod-wrecks")
     }
 )
+
+local function MakeWaterVersion(entityPrototype)
+    local waterEntity = Utils.DeepCopy(entityPrototype)
+    waterEntity.name = waterEntity.name .. "_water"
+    waterEntity.subgroup = "item_delivery_pod-wrecks_water"
+    waterEntity.icon = string.gsub(waterEntity.icon, ".png", "_water.png")
+    waterEntity.collision_mask = {"ground-tile", "object-layer"}
+    if waterEntity.picture ~= nil then
+        waterEntity.picture.filename = string.gsub(waterEntity.picture.filename, ".png", "_water.png")
+    else
+        for _, picture in ipairs(waterEntity.pictures) do
+            picture.filename = string.gsub(picture.filename, ".png", "_water.png")
+        end
+    end
+    data:extend({waterEntity})
+end
+
+MakeWaterVersion(data.raw["container"]["item_delivery_pod-tiny_wrecked_ship_container"])
+MakeWaterVersion(data.raw["container"]["item_delivery_pod-small_wrecked_ship_container"])
+MakeWaterVersion(data.raw["container"]["item_delivery_pod-medium_wrecked_ship_container"])
+MakeWaterVersion(data.raw["container"]["item_delivery_pod-large_wrecked_ship_container"])
+MakeWaterVersion(data.raw["container"]["item_delivery_pod-modular_bridge_wrecked_ship_container"])
+MakeWaterVersion(data.raw["container"]["item_delivery_pod-modular_thruster_wrecked_ship_container"])
+MakeWaterVersion(data.raw["container"]["item_delivery_pod-modular_hull_wrecked_ship_container"])
+MakeWaterVersion(data.raw["simple-entity"]["item_delivery_pod-debris"])
