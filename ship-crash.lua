@@ -28,7 +28,7 @@ end
 
 function ShipCrash.CallCrashShipCommand(command)
     local args = Commands.GetArgumentsFromCommand(command.parameter)
-    if #args < 3 or #args > 4 then
+    if #args <= 2 or #args >= 5 then
         Logging.LogPrint("ERROR: item_delivery_pod-call_crash_ship wrong number of arguments: " .. command.parameter)
         return
     end

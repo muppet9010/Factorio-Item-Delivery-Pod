@@ -1,7 +1,8 @@
 ---------------------------------------------------------------------------------------------------
-Version: 17.0.2
-Date: 2019-07-XX
+Version: 18.0.2
+Date: 2020-xx-XX
   Features:
+    - Update for Factorio 0.18
   Changes:
   Bugfixes:
     - Added missing localisations for water explosions
@@ -10,9 +11,9 @@ Date: 2019-07-XX
 Version: 17.0.1
 Date: 2019-07-14
   Features:
-   - added water impact graphics and effects
+    - added water impact graphics and effects
   Changes:
-   - tweak smoke and fire effects, positions and quantity slightly
+    - tweak smoke and fire effects, positions and quantity slightly
   Bugfixes:
   Info:
 ---------------------------------------------------------------------------------------------------

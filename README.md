@@ -11,12 +11,12 @@ Command & Remote Interface are the way to trigger a delivery providng the delive
 Remote Interface: "item_delivery_pod", "call_crash_ship"
 Command: "item_delivery_pod-call_crash_ship"
 Arguments (in order):
- - target = either a player name to target or a position table (array of x and y or a dictionary of x and y key value pairs)
+ - target = either a player name to target or a position (array of x and y [0,0] or a dictionary of x and y key value pairs {"x"=0,"y"=0})
  - radius = radius (integer) from the target that the pod will randomly select somewhere to land within.
  - crashTypeName = the name of a pod/ship type for the delivery, either: "tiny", "small", "medium", "large", or "modular". If modular then the number of modules must be specified as a number on the end of the name, i.e. "modular6".
  - contents = a table (dictionary) of itemName (string) and quantity (integer). Modular pods will have the contents devided up across the large debris pieces. Can be intentionally empty with "nil"
 All arguments via command accept strings with spaces in if wrapped in double or single quotes, i.e. "User Name 53". They also accept tables in JSON format WITHOUT spaces, i.e. {"iron-plate":100,"coin":100}
 
 Command examples:
-/item_delivery_pod-call_crash_ship "muppet9010" 150, "tiny", {"iron-plate":100,"coin":100}
-/item_delivery_pod-call_crash_ship {10,-10} 150, "tiny", nil
+/item_delivery_pod-call_crash_ship "muppet9010" 150 "tiny" {"iron-plate":100,"coin":100}
+/item_delivery_pod-call_crash_ship [10,-10] 150 "tiny" nil
