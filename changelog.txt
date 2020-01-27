@@ -4,9 +4,10 @@ Date: 2020-xx-XX
   Features:
     - Update for Factorio 0.18
   Changes:
+    - slightly reduce damage of tiny crashing ship. so it doesn't kill things around it by 1 tile any more.
   Bugfixes:
     - Added missing localisations for water explosions
-    - Corrected total fire burn times from being unintentionally doubled and reduced ingame total burn times from before.
+    - Corrected total fire burn times from being unintentionally doubled
   Info:
 ---------------------------------------------------------------------------------------------------
 Version: 17.0.1

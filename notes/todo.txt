@@ -1,4 +1,3 @@
-- look at adding particles for stone/ground beign thrown up on the impact to go with the smoke
 - record a description tag when calling in ships as optional. we will pass in support name
 - record damage/kills done by each ship to table
 - review if we want things destroyed by impact to have a blueprint of them put back over the wreckage (or after mined if not possible)?

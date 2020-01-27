@@ -14,7 +14,6 @@ ShipCrash.shipCreateHeight = 300
 ShipCrash.shadowGroundOffsetMultiplier = {x = 60 / 100, y = 48 / 100}
 ShipCrash.startingImageScale = 0.1
 ShipCrash.imageScaleChangePerTick = (1 - ShipCrash.startingImageScale) / ShipCrash.fallingTicks
-ShipCrash.fireBurningSeconds = {min = 10, max = 16}
 
 function ShipCrash.CreateGlobals()
     global.ShipCrash = global.ShipCrash or {}
@@ -54,7 +53,7 @@ function ShipCrash.CallCrashShip(target, radius, crashTypeName, contents)
         end
     else
         local crashSitePosition = Utils.RandomLocationInRadius(targetPos, radius)
-        local wreckPieces = Utils.CalculateModularShipWreckPieces(crashType, typeValue, crashSitePosition, surface)
+        local wreckPieces = ShipCrash.CalculateModularShipWreckPieces(crashType, typeValue, crashSitePosition, surface)
         local contentsToGo = Utils.DeepCopy(contents)
         local contentsPerWreck = {}
         for itemName, count in pairs(contents) do
@@ -75,7 +74,7 @@ function ShipCrash.CallCrashShip(target, radius, crashTypeName, contents)
     end
 end
 
-function Utils.CalculateModularShipWreckPieces(crashType, typeValue, crashSitePosition, surface)
+function ShipCrash.CalculateModularShipWreckPieces(crashType, typeValue, crashSitePosition, surface)
     local wrecksLeftToAdd = typeValue
     local wreckPlacementGroups = {front = {}, middle = {}, back = {}}
     local wreckPieces = {}
@@ -330,7 +329,7 @@ function ShipCrash.CreateDebris(debrisType, surface, position, playerForce)
     if surface.get_tile(position.x, position.y).collides_with("water-tile") then
         fireOnWater = true
     end
-    ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, ShipCrash.fireBurningSeconds.min, ShipCrash.fireBurningSeconds.max, fireOnWater)
+    ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, 12, 20, fireOnWater)
     surface.create_entity {name = debrisType.impactEffectName, position = position}
 end
 
@@ -408,7 +407,7 @@ function ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosit
         else
             return
         end
-        ShipCrash.CreateRandomLengthFire(math.random(1, 2), surface, pos, ShipCrash.fireBurningSeconds.min, ShipCrash.fireBurningSeconds.max, fireOnWater)
+        ShipCrash.CreateRandomLengthFire(math.random(1, 2), surface, pos, 8, 16, fireOnWater)
     end
 end
 
