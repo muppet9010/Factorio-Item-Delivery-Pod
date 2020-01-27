@@ -1,1 +1,13 @@
-look at adding particles for stone/ground beign thrown up on the impact to go with the smoke
+- look at adding particles for stone/ground beign thrown up on the impact to go with the smoke
+- record a description tag when calling in ships as optional. we will pass in support name
+- record damage/kills done by each ship to table
+- review if we want things destroyed by impact to have a blueprint of them put back over the wreckage (or after mined if not possible)?
+- simple export option of supports rockets launched for uplaod to spreadsheet.
+- GUI to show best single ship kill, best average over player, etc other funny stats.
+- when a ship wreck/debrie is picked up its own fires should stop quickly.
+- check out how a modular6 ends up with rear bits soo close togeather.
+- Have modular ships all do their explosion effects and then next tick all place their bits down. To avoid blowing up each others debris.
+- Add the start of the rocket launch sound to an invisible entity that is at the falling ship position. Also a louder impact.
+- Add in flying text over the crashed ship of who's donation, type and value it is. Optional mod setting.
+- Add a map alert tied to the container of crashs with the ship size as its icon to help find further away crashes. Optional mod setting.
+- Add a player optional viewer of each crashing ship.

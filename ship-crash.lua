@@ -14,6 +14,7 @@ ShipCrash.shipCreateHeight = 300
 ShipCrash.shadowGroundOffsetMultiplier = {x = 60 / 100, y = 48 / 100}
 ShipCrash.startingImageScale = 0.1
 ShipCrash.imageScaleChangePerTick = (1 - ShipCrash.startingImageScale) / ShipCrash.fallingTicks
+ShipCrash.fireBurningSeconds = {min = 10, max = 16}
 
 function ShipCrash.CreateGlobals()
     global.ShipCrash = global.ShipCrash or {}
@@ -325,11 +326,11 @@ function ShipCrash.CreateDebris(debrisType, surface, position, playerForce)
     end
     surface.create_entity {name = debrisEntityName, position = position, force = playerForce}
     ShipCrash.CreateCraterImpact(debrisType.craterName, debrisType.rocks, debrisType.killRadius, surface, position)
-    if not surface.get_tile(position.x, position.y).collides_with("water-tile") then
-        ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, 6, 10)
-    else
-        ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, 6, 10, true)
+    local fireOnWater = false
+    if surface.get_tile(position.x, position.y).collides_with("water-tile") then
+        fireOnWater = true
     end
+    ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, ShipCrash.fireBurningSeconds.min, ShipCrash.fireBurningSeconds.max, fireOnWater)
     surface.create_entity {name = debrisType.impactEffectName, position = position}
 end
 
@@ -399,11 +400,15 @@ function ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosit
     fireCount = math.random(math.floor(fireCount * 0.75), math.floor(fireCount * 1.25))
     for i = 1, fireCount do
         local pos = Utils.RandomLocationInRadius(craterPosition, minRadius, maxRadius)
+        local fireOnWater
         if not surface.get_tile(pos.x, pos.y).collides_with("water-tile") then
-            ShipCrash.CreateRandomLengthFire(math.random(1, 2), surface, pos, 4, 8)
+            fireOnWater = false
         elseif allowFireOnWater then
-            ShipCrash.CreateRandomLengthFire(math.random(1, 2), surface, pos, 4, 8, true)
+            fireOnWater = true
+        else
+            return
         end
+        ShipCrash.CreateRandomLengthFire(math.random(1, 2), surface, pos, ShipCrash.fireBurningSeconds.min, ShipCrash.fireBurningSeconds.max, fireOnWater)
     end
 end
 
@@ -416,16 +421,18 @@ function ShipCrash.CreateRandomLengthFire(fireCount, surface, position, minSecon
     local secondsPerFlame = math.random(minSecondsPerFlame, maxSecondsPerFlame)
     local flameInstanceId = global.ShipCrash.fireEntityInstanceId
     global.ShipCrash.fireEntityInstanceId = global.ShipCrash.fireEntityInstanceId + 1
-    EventScheduler.ScheduleEvent(game.tick + FireTypes["debris"].initialLifetime, "ShipCrash.RenewFireScheduledEvent", flameInstanceId, {fireCount = fireCount, surface = surface, position = position, secondsPerFlame = secondsPerFlame, currentBurnTime = 1, fireOnWater = fireOnWater})
+    local fireLifetime = FireTypes["debris"].initialLifetime
+    EventScheduler.ScheduleEvent(game.tick + fireLifetime, "ShipCrash.RenewFireScheduledEvent", flameInstanceId, {fireCount = fireCount, surface = surface, position = position, secondsPerFlame = secondsPerFlame, currentBurnTime = fireLifetime, fireOnWater = fireOnWater})
 end
 
 function ShipCrash.RenewFireScheduledEvent(event)
+    local fireLifetime = FireTypes["debris"].initialLifetime
     local data = event.data
     if data.currentBurnTime >= data.secondsPerFlame then
         data.fireCount = data.fireCount - 1
-        data.currentBurnTime = 1
+        data.currentBurnTime = fireLifetime
     else
-        data.currentBurnTime = data.currentBurnTime + 1
+        data.currentBurnTime = data.currentBurnTime + fireLifetime
     end
     if data.fireCount <= 0 then
         return

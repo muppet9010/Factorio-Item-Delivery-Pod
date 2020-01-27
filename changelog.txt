@@ -6,6 +6,7 @@ Date: 2020-xx-XX
   Changes:
   Bugfixes:
     - Added missing localisations for water explosions
+    - Corrected total fire burn times from being unintentionally doubled and reduced ingame total burn times from before.
   Info:
 ---------------------------------------------------------------------------------------------------
 Version: 17.0.1

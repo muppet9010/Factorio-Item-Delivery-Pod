@@ -18,5 +18,5 @@ Arguments (in order):
 All arguments via command accept strings with spaces in if wrapped in double or single quotes, i.e. "User Name 53". They also accept tables in JSON format WITHOUT spaces, i.e. {"iron-plate":100,"coin":100}
 
 Command examples:
-/item_delivery_pod-call_crash_ship "muppet9010" 150 "tiny" {"iron-plate":100,"coin":100}
-/item_delivery_pod-call_crash_ship [10,-10] 150 "tiny" nil
+/item_delivery_pod-call_crash_ship "muppet9010" 5 "large" {"iron-plate":100,"coin":100}
+/item_delivery_pod-call_crash_ship [10,-10] 50 "tiny" nil
