@@ -23,10 +23,14 @@ function Utils.KillAllObjectsInArea(surface, positionedBoundingBox, killerEntity
     local entitiesFound = surface.find_entities(positionedBoundingBox)
     for k, entity in pairs(entitiesFound) do
         if entity.valid then
-            if killerEntity ~= nil then
-                entity.die("neutral", killerEntity)
+            if entity.destructible then
+                if killerEntity ~= nil then
+                    entity.die("neutral", killerEntity)
+                else
+                    entity.die("neutral")
+                end
             else
-                entity.die("neutral")
+                entity.destroy({dp_cliff_correction = true, raise_destroy = false})
             end
         end
     end
@@ -251,20 +255,10 @@ function Utils.FuzzyCompareDoubles(num1, logic, num2)
     end
 end
 
-function Utils.GetTableLength(table)
+function Utils.GetTableNonNilLength(table)
     local count = 0
     for _ in pairs(table) do
         count = count + 1
-    end
-    return count
-end
-
-function Utils.GetTableNonNilLength(table)
-    local count = 0
-    for k, v in pairs(table) do
-        if v ~= nil then
-            count = count + 1
-        end
     end
     return count
 end
@@ -348,10 +342,9 @@ end
 function Utils._TableContentsToJSON(target_table, name, tablesLogged, indent, stop_traversing)
     indent = indent or 1
     local indentstring = string.rep(" ", (indent * 4))
-    local table_id = string.gsub(tostring(target_table), "table: ", "")
-    tablesLogged[table_id] = "logged"
+    tablesLogged[target_table] = "logged"
     local table_contents = ""
-    if Utils.GetTableLength(target_table) > 0 then
+    if Utils.GetTableNonNilLength(target_table) > 0 then
         for k, v in pairs(target_table) do
             local key, value
             if type(k) == "string" or type(k) == "number" or type(k) == "boolean" then
@@ -359,12 +352,11 @@ function Utils._TableContentsToJSON(target_table, name, tablesLogged, indent, st
             elseif type(k) == "nil" then
                 key = '"nil"'
             elseif type(k) == "table" then
-                local sub_table_id = string.gsub(tostring(k), "table: ", "")
                 if stop_traversing == true then
-                    key = '"CIRCULAR LOOP TABLE'
+                    key = '"CIRCULAR LOOP TABLE"'
                 else
                     local sub_stop_traversing = nil
-                    if tablesLogged[sub_table_id] ~= nil then
+                    if tablesLogged[k] ~= nil then
                         sub_stop_traversing = true
                     end
                     key = "{\r\n" .. Utils._TableContentsToJSON(k, name, tablesLogged, indent + 1, sub_stop_traversing) .. "\r\n" .. indentstring .. "}"
@@ -379,12 +371,11 @@ function Utils._TableContentsToJSON(target_table, name, tablesLogged, indent, st
             elseif type(v) == "nil" then
                 value = '"nil"'
             elseif type(v) == "table" then
-                local sub_table_id = string.gsub(tostring(v), "table: ", "")
                 if stop_traversing == true then
-                    value = '"CIRCULAR LOOP TABLE'
+                    value = '"CIRCULAR LOOP TABLE"'
                 else
                     local sub_stop_traversing = nil
-                    if tablesLogged[sub_table_id] ~= nil then
+                    if tablesLogged[v] ~= nil then
                         sub_stop_traversing = true
                     end
                     value = "{\r\n" .. Utils._TableContentsToJSON(v, name, tablesLogged, indent + 1, sub_stop_traversing) .. "\r\n" .. indentstring .. "}"
@@ -440,7 +431,7 @@ function Utils.WasCreativeModeInstantDeconstructionUsed(event)
 end
 
 function Utils.GetBiterType(modEnemyProbabilities, spawnerType, evolution)
-    --modEnemyProbabilities argument is a global variable the utility function can use. do not set in any way
+    --modEnemyProbabilities argument is a global variable thats passed in for the utility function can use. do not set in any way before hand.
     modEnemyProbabilities = modEnemyProbabilities or {}
     if modEnemyProbabilities[spawnerType] == nil then
         modEnemyProbabilities[spawnerType] = {}
@@ -450,14 +441,12 @@ function Utils.GetBiterType(modEnemyProbabilities, spawnerType, evolution)
         modEnemyProbabilities[spawnerType].calculatedEvolution = evolution
         modEnemyProbabilities[spawnerType].probabilities = Utils._CalculateSpecificBiterSelectionProbabilities(spawnerType, evolution)
     end
-
-    return Utils.GetRandomEntryFromNormalisedDataSet(modEnemyProbabilities[spawnerType].probabilitie, "chance").unit
+    return Utils.GetRandomEntryFromNormalisedDataSet(modEnemyProbabilities[spawnerType].probabilities, "chance").unit
 end
 
 function Utils._CalculateSpecificBiterSelectionProbabilities(spawnerType, currentEvolution)
     local rawUnitProbs = game.entity_prototypes[spawnerType].result_units
     local currentEvolutionProbabilities = {}
-
     for _, possibility in pairs(rawUnitProbs) do
         local startSpawnPointIndex = nil
         for spawnPointIndex, spawnPoint in pairs(possibility.spawn_points) do
@@ -486,21 +475,20 @@ function Utils._CalculateSpecificBiterSelectionProbabilities(spawnerType, curren
             table.insert(currentEvolutionProbabilities, {chance = weight, unit = possibility.unit})
         end
     end
-
-    local normalisedcurrentEvolutionProbabilities = Utils.NormalisedChanceList(currentEvolutionProbabilities, "chance")
-
+    local normalisedcurrentEvolutionProbabilities = Utils.NormaliseChanceList(currentEvolutionProbabilities, "chance")
     return normalisedcurrentEvolutionProbabilities
 end
 
-function Utils.NormalisedChanceList(dataSet, chancePropertyName)
+function Utils.NormaliseChanceList(dataSet, chancePropertyName)
     local totalChance = 0
-    for k, v in pairs(dataSet) do
+    for _, v in pairs(dataSet) do
         totalChance = totalChance + v[chancePropertyName]
     end
     local multiplier = 1 / totalChance
     for _, v in pairs(dataSet) do
         v[chancePropertyName] = v[chancePropertyName] * multiplier
     end
+    return dataSet
 end
 
 function Utils.GetRandomEntryFromNormalisedDataSet(dataSet, chancePropertyName)
