@@ -35,8 +35,8 @@ function ShipCrash.CallCrashShipCommand(command)
     ShipCrash.CallCrashShip(args[1], args[2], args[3], args[4])
 end
 
-function ShipCrash.CallCrashShip(target, radius, crashTypeName, contents)
-    local targetPos, crashType, typeValue = ShipCrash.ValidateCallData(target, radius, crashTypeName, contents)
+function ShipCrash.CallCrashShip(target, radiusRaw, crashTypeName, contents)
+    local targetPos, crashType, typeValue, radiusMin, radiusMax = ShipCrash.ValidateCallData(target, radiusRaw, crashTypeName, contents)
     if targetPos == nil or crashType == nil then
         return
     end
@@ -45,14 +45,14 @@ function ShipCrash.CallCrashShip(target, radius, crashTypeName, contents)
     local playerForce = game.forces[1]
 
     if crashType.hasTypeValue == false then
-        local crashSitePosition = ShipCrash.FindLandWaterPositionNearTarget(targetPos, surface, Utils.RandomLocationInRadius(targetPos, radius), crashType.container.landPlacementTestEntityName, crashType.container.waterPlacementTestEntityName, 10, 5)
+        local crashSitePosition = ShipCrash.FindLandWaterPositionNearTarget(targetPos, surface, Utils.RandomLocationInRadius(targetPos, radiusMax, radiusMin), crashType.container.landPlacementTestEntityName, crashType.container.waterPlacementTestEntityName, 10, 5)
         local debrisPieces = ShipCrash.CalculateDebrisPieces(crashType, crashSitePosition, surface)
         ShipCrash.StartCrashShipFalling(crashType.container, crashSitePosition, surface, playerForce, contents, debrisPieces)
         for _, debrisPiece in ipairs(debrisPieces) do
             ShipCrash.StartCrashShipFalling(debrisPiece.debrisType, debrisPiece.position, surface, playerForce)
         end
     else
-        local crashSitePosition = Utils.RandomLocationInRadius(targetPos, radius)
+        local crashSitePosition = Utils.RandomLocationInRadius(targetPos, radiusMax, radiusMin)
         local wreckPieces = ShipCrash.CalculateModularShipWreckPieces(crashType, typeValue, crashSitePosition, surface)
         local contentsToGo = Utils.DeepCopy(contents)
         local contentsPerWreck = {}
@@ -455,7 +455,7 @@ function ShipCrash.PlaceRocksRandomlyWithinRadius(rockCount, rockEntityNames, su
     end
 end
 
-function ShipCrash.ValidateCallData(target, radius, crashTypeName, contents)
+function ShipCrash.ValidateCallData(target, radiusRaw, crashTypeName, contents)
     local targetPos
     if type(target) == "string" then
         local targetPlayer = game.get_player(target)
@@ -474,10 +474,36 @@ function ShipCrash.ValidateCallData(target, radius, crashTypeName, contents)
         Logging.LogPrint("Error: call_crash_ship invalid target value: " .. tostring(target))
         return
     end
-    if type(radius) ~= "number" or radius < 0 then
-        Logging.LogPrint("Error: call_crash_ship invalid radius positive number value: " .. tostring(radius))
+
+    local radiusMin, radiusMax = 0
+    if type(radiusRaw) == "number" then
+        radiusMax = radiusRaw
+    elseif type(radiusRaw) == "table" then
+        if type(radiusRaw[1]) == "number" then
+            radiusMin = radiusRaw[1]
+        else
+            Logging.LogPrint("Error: call_crash_ship invalid radius minimum value: " .. tostring(radiusRaw[1]))
+            return
+        end
+        if type(radiusRaw[2]) == "number" then
+            radiusMax = radiusRaw[2]
+        else
+            Logging.LogPrint("Error: call_crash_ship invalid radius maximum value: " .. tostring(radiusRaw[2]))
+            return
+        end
+    else
+        Logging.LogPrint("Error: call_crash_ship invalid radius value: " .. tostring(radiusRaw))
         return
     end
+    if radiusMin < 0 then
+        Logging.LogPrint("Error: call_crash_ship invalid radius minimum, must be a positive number value: " .. tostring(radiusMin))
+        return
+    end
+    if radiusMax < 0 then
+        Logging.LogPrint("Error: call_crash_ship invalid radius maximum, must be a positive number value: " .. tostring(radiusMax))
+        return
+    end
+
     if type(crashTypeName) ~= "string" then
         Logging.LogPrint("Error: call_crash_ship invalid ship value type: " .. tostring(crashTypeName))
         return
@@ -505,6 +531,7 @@ function ShipCrash.ValidateCallData(target, radius, crashTypeName, contents)
             return
         end
     end
+
     if type(contents) == "table" then
         for itemName, quantity in pairs(contents) do
             if game.item_prototypes[itemName] == nil then
@@ -520,7 +547,7 @@ function ShipCrash.ValidateCallData(target, radius, crashTypeName, contents)
         return
     end
 
-    return targetPos, crashType, typeValue
+    return targetPos, crashType, typeValue, radiusMin, radiusMax
 end
 
 return ShipCrash
