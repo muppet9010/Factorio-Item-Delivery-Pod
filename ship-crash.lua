@@ -24,6 +24,8 @@ function ShipCrash.OnLoad()
     Commands.Register("item_delivery_pod-call_crash_ship", {"api-description.item_delivery_pod-call_crash_ship"}, ShipCrash.CallCrashShipCommand, true)
     EventScheduler.RegisterScheduledEventType("ShipCrash.RenewFireScheduledEvent", ShipCrash.RenewFireScheduledEvent)
     EventScheduler.RegisterScheduledEventType("ShipCrash.UpdateFallingShipScheduledEvent", ShipCrash.UpdateFallingShipScheduledEvent)
+	remote.add_interface("item_delivery_pod", {call_crash_ship = ShipCrash.CallCrashShip}
+)
 end
 
 function ShipCrash.CallCrashShipCommand(command)
