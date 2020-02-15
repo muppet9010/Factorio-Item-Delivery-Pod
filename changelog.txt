@@ -4,6 +4,7 @@ Date: 2020-02-15
   Features:
     - Update for Factorio 0.18
     - radius now supports an array to provide min and max radius for centre of drop pod to be from target to avoid hitting the target directly. Old single number can still be supplied and will apply a minimum radius of 0.
+    - supports an "auto" modular ship type thats used with a mod setting to calculate how many ship parts a modual ship of a given weight should have. Useful for API streaming integrations.
   Changes:
     - slightly reduce damage of tiny crashing ship. so it doesn't kill things around it by 1 tile any more.
   Bugfixes:

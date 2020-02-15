@@ -18,14 +18,24 @@ ShipCrash.imageScaleChangePerTick = (1 - ShipCrash.startingImageScale) / ShipCra
 function ShipCrash.CreateGlobals()
     global.ShipCrash = global.ShipCrash or {}
     global.ShipCrash.fireEntityInstanceId = global.ShipCrash.fireEntityInstanceId or 1
+    global.ShipCrash.modularShipPartWeight = global.ShipCrash.modularShipPartWeight or 0
 end
 
 function ShipCrash.OnLoad()
     Commands.Register("item_delivery_pod-call_crash_ship", {"api-description.item_delivery_pod-call_crash_ship"}, ShipCrash.CallCrashShipCommand, true)
     EventScheduler.RegisterScheduledEventType("ShipCrash.RenewFireScheduledEvent", ShipCrash.RenewFireScheduledEvent)
     EventScheduler.RegisterScheduledEventType("ShipCrash.UpdateFallingShipScheduledEvent", ShipCrash.UpdateFallingShipScheduledEvent)
-	remote.add_interface("item_delivery_pod", {call_crash_ship = ShipCrash.CallCrashShip}
-)
+    remote.add_interface("item_delivery_pod", {call_crash_ship = ShipCrash.CallCrashShip})
+end
+
+ShipCrash.OnSettingChanged = function(event)
+    local settingName
+    if event ~= nil then
+        settingName = event.setting
+    end
+    if settingName == nil or settingName == "item_delivery_pod-modular_ship_part_weight" then
+        global.ShipCrash.modularShipPartWeight = settings.global["item_delivery_pod-modular_ship_part_weight"].value
+    end
 end
 
 function ShipCrash.CallCrashShipCommand(command)
@@ -525,12 +535,27 @@ function ShipCrash.ValidateCallData(target, radiusRaw, crashTypeName, contents)
         Logging.LogPrint("Error: call_crash_ship invalid crashTypeName: " .. tostring(crashTypeName))
         return
     end
-    local typeValue
+    local typeValueString, typeValue
     if crashType.hasTypeValue then
-        typeValue = string.gsub(crashTypeName, crashType.name, "")
-        if typeValue == nil or typeValue == "" or typeValue == " " then
+        typeValueString = string.gsub(crashTypeName, crashType.name, "")
+        if typeValueString == nil or typeValueString == "" or typeValueString == " " then
             Logging.LogPrint("Error: call_crash_ship invalid value on this crash type: " .. tostring(crashTypeName))
             return
+        end
+        typeValue = tonumber(typeValueString)
+        if typeValue == nil then
+            if string.find(typeValueString, "%-auto%-") ~= nil then
+                local weightString = string.gsub(typeValueString, "%-auto%-", "")
+                local weight = tonumber(weightString)
+                if weight == nil then
+                    Logging.LogPrint("Error: call_crash_ship invalid value on this crash type auto weight: " .. tostring(crashTypeName))
+                    return
+                end
+                typeValue = math.floor(weight / global.ShipCrash.modularShipPartWeight)
+            else
+                Logging.LogPrint("Error: call_crash_ship no value on this crash type supplied: " .. tostring(crashTypeName))
+                return
+            end
         end
     end
 
