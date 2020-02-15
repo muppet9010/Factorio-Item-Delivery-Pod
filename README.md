@@ -27,5 +27,7 @@ All arguments via command accept strings with spaces in if wrapped in double or 
 Interface calls should be made using Lua syntax and not JSON format arguments.
 
 Command examples:
-`/item_delivery_pod-call_crash_ship "muppet9010" 5 "large" {"iron-plate":100,"coin":100}`
-`/item_delivery_pod-call_crash_ship [10,-10] 50 "tiny" nil`
+- Call a large ship down near a named player with some iron and coins in it:
+	- `/item_delivery_pod-call_crash_ship "muppet9010" 5 "large" {"iron-plate":100,"coin":100}`
+- Call a tiny ship down in an area around a specific position with no contents:
+	- `/item_delivery_pod-call_crash_ship [10,-10] 50 "tiny" nil`
