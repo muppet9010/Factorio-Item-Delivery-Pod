@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 18.0.2
-Date: 2020-xx-XX
+Date: 2020-02-15
   Features:
     - Update for Factorio 0.18
     - radius now supports an array to provide min and max radius for centre of drop pod to be from target to avoid hitting the target directly. Old single number can still be supplied and will apply a minimum radius of 0.

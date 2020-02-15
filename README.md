@@ -1,13 +1,15 @@
 # Factorio-Item-Delivery-Pod
 
 A mod to send items towards a player/position from space in a ship/pod. They will crash land in a destroyed spaceship making a mess.
-If only there was a technology to direct the pods to be landed in a safe manner...
+
+![Delivery pods landing](https://thumbs.gfycat.com/LongImmenseKinglet-size_restricted.gif)
 
 Details
 ----------
 
 The pods will land on both water and land, causing damage and making a mess. The crashs create smoke, wreckage and fires that will slowly burn out. The larger pods/ships come down with additional debris pieces.
 A modular ship is made up of large debris parts of the number specified. Any contents will be within the main part of the ship/wrecks and can be aquired by mining the pod. A pods internal inventory is 999 slots so a lot can be fitted in to them.
+
 
 Usage Notes
 ------------
@@ -25,5 +27,5 @@ All arguments via command accept strings with spaces in if wrapped in double or 
 Interface calls should be made using Lua syntax and not JSON format arguments.
 
 Command examples:
-/item_delivery_pod-call_crash_ship "muppet9010" 5 "large" {"iron-plate":100,"coin":100}
-/item_delivery_pod-call_crash_ship [10,-10] 50 "tiny" nil
+`/item_delivery_pod-call_crash_ship "muppet9010" 5 "large" {"iron-plate":100,"coin":100}`
+`/item_delivery_pod-call_crash_ship [10,-10] 50 "tiny" nil`
