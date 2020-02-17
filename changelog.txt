@@ -7,6 +7,7 @@ Date: 2020-02-15
     - supports an "auto" modular ship type thats used with a mod setting to calculate how many ship parts a modual ship of a given weight should have. Useful for API streaming integrations.
   Changes:
     - slightly reduce damage of tiny crashing ship. so it doesn't kill things around it by 1 tile any more.
+    - JSON command arguments support spaces and more natural for use.
   Bugfixes:
     - Added missing localisations for water explosions
     - Corrected total fire burn times from being unintentionally doubled

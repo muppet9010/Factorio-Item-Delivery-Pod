@@ -30,12 +30,12 @@ Arguments (in order):
  - crashTypeName = the name of a pod/ship type for the delivery, either: "tiny", "small", "medium", "large", or "modular".
  - contents = a table (dictionary) of itemName (string) and quantity (integer). Modular pods will have the contents devided up across the large debris pieces. Can be intentionally empty with "nil"
 
-All arguments in the command accept strings with spaces in if the strings are wrapped in double or single quotes, i.e. "User Name 53". They also accept tables in JSON format WITHOUT spaces within them, i.e. {"iron-plate":100,"coin":100}
+All arguments in the command accept strings with spaces in if the strings are wrapped in double or single quotes, i.e. "User Name 53". You can escape quote characters with \ if needed, i.e. "m\"e" = m"e . They also accept tables in JSON format, i.e. {"iron-plate": 100,"coin": 100}
 Interface (remote) calls should be made using Lua syntax and not JSON format arguments.
 
 Command examples:
 - Call a large ship down near a named player with some iron and coins in it:
-	- `/item_delivery_pod-call_crash_ship "muppet9010" 5 "large" {"iron-plate":100,"coin":100}`
+	- `/item_delivery_pod-call_crash_ship "muppet9010" 5 "large" {"iron-plate":100, "coin":100}`
 - Call a tiny ship down in an area around a specific position with no contents:
 	- `/item_delivery_pod-call_crash_ship [10,-10] 50 "tiny" nil`
 
