@@ -1,17 +1,20 @@
-local ShipCrash = require("ship-crash")
+local ShipCrashManger = require("scripts/ship-crash-manager")
+local ShipCrashController = require("scripts/ship-crash-controller")
 local EventScheduler = require("utility/event-scheduler")
 
 local function CreateGlobals()
-    ShipCrash.CreateGlobals()
+    ShipCrashManger.CreateGlobals()
+    ShipCrashController.CreateGlobals()
 end
 
 local function OnLoad()
     remote.remove_interface("item_delivery_pod")
-    ShipCrash.OnLoad()
+    ShipCrashManger.OnLoad()
+    ShipCrashController.OnLoad()
 end
 
 local function OnSettingChanged(event)
-    ShipCrash.OnSettingChanged(event)
+    ShipCrashManger.OnSettingChanged(event)
 end
 
 local function OnStartup()
