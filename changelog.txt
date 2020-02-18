@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 18.0.2
-Date: 2020-02-15
+Date: 2020-02-18
   Features:
     - Update for Factorio 0.18
     - radius now supports an array to provide min and max radius for centre of drop pod to be from target to avoid hitting the target directly. Old single number can still be supplied and will apply a minimum radius of 0.
@@ -11,6 +11,8 @@ Date: 2020-02-15
   Bugfixes:
     - Added missing localisations for water explosions
     - Corrected total fire burn times from being unintentionally doubled
+    - all modular ships guarenteed to have a rocket booster part if size of 2 or greater.
+    - a modular ship can be called with nil contents without a crash
   Info:
 ---------------------------------------------------------------------------------------------------
 Version: 17.0.1
