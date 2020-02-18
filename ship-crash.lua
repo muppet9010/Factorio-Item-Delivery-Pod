@@ -132,7 +132,7 @@ function ShipCrash.CalculateModularShipWreckPieces(crashType, typeValue, crashSi
         for currentRowFrontCount, wreckTypeName in ipairs(wreckPlacementGroups.front) do
             local wreckType = CrashTypes[wreckTypeName]
             local wreckTypeContainer = wreckType.container
-            local yOffset = 0 - (totalWidth / 2) + ((currentRowFrontCount - 1) * frontPieceWidth) + (frontPieceWidth / 2)
+            local yOffset = 0 - (totalWidth / 3) + ((currentRowFrontCount - 1) * frontPieceWidth) + (frontPieceWidth / 2)
             local xOffset = 0 - (lengthCounter * (wreckSpacing + 1)) - ((wreckSpacing + 1) / 2)
             local targetPos = Utils.ApplyOffsetToPosition(crashSitePosition, {x = xOffset, y = yOffset})
             local pos = ShipCrash.FindLandWaterPositionNearTarget(targetPos, surface, Utils.RandomLocationInRadius(targetPos, 0, 2), wreckTypeContainer.landPlacementTestEntityName, wreckTypeContainer.waterPlacementTestEntityName, wreckPlacementRadius, 1)
@@ -154,7 +154,7 @@ function ShipCrash.CalculateModularShipWreckPieces(crashType, typeValue, crashSi
                     local wreckTypeName = wreckPlacementGroups.middle[currentTotalMiddleToDo]
                     local wreckType = CrashTypes[wreckTypeName]
                     local wreckTypeContainer = wreckType.container
-                    local yOffset = (0 - (totalWidth / 2)) + ((currentRowMiddleCount - 1) * middlePieceWidth) + (middlePieceWidth / 2)
+                    local yOffset = (0 - (totalWidth / 3)) + ((currentRowMiddleCount - 1) * middlePieceWidth) + (middlePieceWidth / 2)
                     local xOffset = 0 - ((lengthCounter * wreckSpacing) + (wreckSpacing / 2))
                     local targetPos = Utils.ApplyOffsetToPosition(crashSitePosition, {x = xOffset, y = yOffset})
                     local pos = ShipCrash.FindLandWaterPositionNearTarget(targetPos, surface, Utils.RandomLocationInRadius(targetPos, 0, 2), wreckTypeContainer.landPlacementTestEntityName, wreckTypeContainer.waterPlacementTestEntityName, wreckPlacementRadius, 1)
