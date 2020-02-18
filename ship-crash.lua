@@ -341,7 +341,7 @@ function ShipCrash.CreateDebris(debrisType, surface, position, playerForce)
     if surface.get_tile(position.x, position.y).collides_with("water-tile") then
         fireOnWater = true
     end
-    ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, 12, 20, fireOnWater)
+    ShipCrash.CreateRandomLengthFire(math.random(2, 3), surface, position, 25, 40, fireOnWater)
     surface.create_entity {name = debrisType.impactEffectName, position = position}
 end
 
@@ -417,7 +417,7 @@ function ShipCrash.PlaceFireRandomlyWithinRadius(fireCount, surface, craterPosit
         else
             return
         end
-        ShipCrash.CreateRandomLengthFire(math.random(1, 2), surface, pos, 8, 16, fireOnWater)
+        ShipCrash.CreateRandomLengthFire(math.random(1, 2), surface, pos, 16, 30, fireOnWater)
     end
 end
 
@@ -451,7 +451,7 @@ function ShipCrash.RenewFireScheduledEvent(event)
         entityName = "item_delivery_pod-debris_fire_flame_water"
     end
     data.surface.create_entity {name = entityName, position = data.position, initial_ground_flame_count = data.fireCount}
-    EventScheduler.ScheduleEvent(event.tick + FireTypes["debris"].initialLifetime, "ShipCrash.RenewFireScheduledEvent", event.instanceId, data)
+    EventScheduler.ScheduleEvent(event.tick + fireLifetime, "ShipCrash.RenewFireScheduledEvent", event.instanceId, data)
 end
 
 function ShipCrash.PlaceRocksRandomlyWithinRadius(rockCount, rockEntityNames, surface, craterPosition, minRadius, maxRadius)
