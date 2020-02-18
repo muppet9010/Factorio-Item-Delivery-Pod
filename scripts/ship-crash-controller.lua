@@ -23,6 +23,7 @@ end
 ShipCrashController.OnLoad = function()
     EventScheduler.RegisterScheduledEventType("ShipCrashController.RenewFireScheduledEvent", ShipCrashController.RenewFireScheduledEvent)
     EventScheduler.RegisterScheduledEventType("ShipCrashController.UpdateFallingShipScheduledEvent", ShipCrashController.UpdateFallingShipScheduledEvent)
+    EventScheduler.RegisterScheduledEventType("ShipCrashController.SpawnCrashShipOnGround", ShipCrashController.SpawnCrashShipOnGround)
 end
 
 ShipCrashController.BeginShipCrashProcess = function(targetPos, crashType, typeValue, radiusMin, radiusMax, contents, surface, force)
@@ -186,7 +187,7 @@ ShipCrashController.UpdateFallingShipScheduledEvent = function(event)
         rendering.destroy(data.shadowRenderId)
         rendering.destroy(data.shipRenderId)
         if data.debrisPieces ~= nil then
-            ShipCrashController.SpawnCrashShipOnGround(data.wreckType, data.targetPos, data.surface, data.playerForce, data.contents, data.debrisPieces)
+            ShipCrashController.ExplodeCrashShipOnGround(data)
         end
         return
     end
@@ -230,22 +231,27 @@ ShipCrashController.CalculateShadowForShip = function(shipPos, currentHeigt)
     }
 end
 
-ShipCrashController.SpawnCrashShipOnGround = function(wreckType, crashSitePosition, surface, playerForce, contents, debrisPieces)
-    local wreckTypeExplosionName = wreckType.explosionName
-    if surface.get_tile(crashSitePosition.x, crashSitePosition.y).collides_with("water-tile") then
+ShipCrashController.ExplodeCrashShipOnGround = function(data)
+    local wreckTypeExplosionName = data.wreckType.explosionName
+    if data.surface.get_tile(data.targetPos.x, data.targetPos.y).collides_with("water-tile") then
         wreckTypeExplosionName = wreckTypeExplosionName .. "_water"
     end
-    surface.create_entity {name = wreckTypeExplosionName, position = crashSitePosition}
-    for _, debrisPiece in ipairs(debrisPieces) do
+    data.surface.create_entity {name = wreckTypeExplosionName, position = data.targetPos}
+    for _, debrisPiece in ipairs(data.debrisPieces) do
         local debrisTypeExplosionName = debrisPiece.debrisType.explosionName
-        if surface.get_tile(debrisPiece.position.x, debrisPiece.position.y).collides_with("water-tile") then
+        if data.surface.get_tile(debrisPiece.position.x, debrisPiece.position.y).collides_with("water-tile") then
             debrisTypeExplosionName = debrisTypeExplosionName .. "_water"
         end
-        surface.create_entity {name = debrisTypeExplosionName, position = debrisPiece.position}
+        data.surface.create_entity {name = debrisTypeExplosionName, position = debrisPiece.position}
     end
-    ShipCrashController.CreateContainer(wreckType, surface, crashSitePosition, contents, playerForce)
-    for _, debrisPiece in ipairs(debrisPieces) do
-        ShipCrashController.CreateDebris(debrisPiece.debrisType, surface, debrisPiece.position, playerForce)
+    EventScheduler.ScheduleEvent(game.tick + 1, "ShipCrashController.SpawnCrashShipOnGround", data.shadowRenderId, data)
+end
+
+ShipCrashController.SpawnCrashShipOnGround = function(event)
+    local data = event.data
+    ShipCrashController.CreateContainer(data.wreckType, data.surface, data.targetPos, data.contents, data.playerForce)
+    for _, debrisPiece in ipairs(data.debrisPieces) do
+        ShipCrashController.CreateDebris(debrisPiece.debrisType, data.surface, debrisPiece.position, data.playerForce)
     end
 end
 
@@ -254,8 +260,8 @@ ShipCrashController.CalculateDebrisPieces = function(parentType, crashSitePositi
     if parentType.debris == nil or parentType.debris == 0 then
         return debrisPieces
     end
-    local minRadius = parentType.container.killRadius
-    local maxRadius = parentType.container.killRadius + (parentType.container.killRadius * 0.5)
+    local minRadius = parentType.container.killRadius - (parentType.container.killRadius * 0.25)
+    local maxRadius = parentType.container.killRadius + (parentType.container.killRadius * 0.25)
 
     local debrisType = CrashTypes.debris
     local totalDebrisCount = math.random(parentType.debris - 1, parentType.debris + 1)

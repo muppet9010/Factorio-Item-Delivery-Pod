@@ -2,17 +2,19 @@
 Version: 18.0.2
 Date: 2020-02-18
   Features:
-    - Update for Factorio 0.18
+    - Update for Factorio 0.18.8
     - radius now supports an array to provide min and max radius for centre of drop pod to be from target to avoid hitting the target directly. Old single number can still be supplied and will apply a minimum radius of 0.
     - supports an "auto" modular ship type thats used with a mod setting to calculate how many ship parts a modual ship of a given weight should have. Useful for API streaming integrations.
   Changes:
     - slightly reduce damage of tiny crashing ship. so it doesn't kill things around it by 1 tile any more.
-    - balanced total fire burn times and modular parts spread
+    - balanced total fire burn times.
     - JSON command arguments support spaces and more natural for use.
+    - slight balance change to modular ship layout and all debris placements.
   Bugfixes:
-    - Added missing localisations for water explosions
+    - Added missing localisations for water explosions.
     - all modular ships guarenteed to have a rocket booster part if size of 2 or greater.
-    - a modular ship can be called with nil contents without a crash
+    - a modular ship can be called with nil contents without a crash.
+    - ship parts/debris in the same ship won't destroy each other when impacting any more.
   Info:
 ---------------------------------------------------------------------------------------------------
 Version: 17.0.1
