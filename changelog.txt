@@ -10,6 +10,7 @@ Date: 2020-02-18
     - balanced total fire burn times.
     - JSON command arguments support spaces and more natural for use.
     - slight balance change to modular ship layout and all debris placements.
+    - added a metal sound effect to mining the ship wrecks and reduced the larger sizes mining time.
   Bugfixes:
     - Added missing localisations for water explosions.
     - all modular ships guarenteed to have a rocket booster part if size of 2 or greater.
