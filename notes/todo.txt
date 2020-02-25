@@ -1,0 +1,17 @@
+Next:
+	- record a description tag when calling in ships as optional. we will pass in supporter name for Will's games
+	- Add in flying text over the crashed ship of who's donation, type and value it is. Optional mod setting.
+	- record damage/kills done by each ship to table
+	- simple export option of supports delivery pods and their kills.
+	- debris has some random low level items in them.
+
+
+Future:
+	- option to make ship parts deconstructable.
+	- Add a map alert tied to the container of crashs with the ship size as its icon to help find further away crashes. Optional mod setting.
+	- Add a player optional viewer of each crashing ship.
+	- Add an unstable spaceship option as a % mod setting. If triggered it explodes with twice its kill radius when mined.
+	- Add the start of the rocket launch sound to an invisible entity that is at the falling ship position. Also a louder impact.
+	- Some sort of way to use the mod in SP. Mod settings for frequency range, size range and coin quantity range?
+	- review if we want things destroyed by impact to have a blueprint of them put back over the wreckage (or after mined if not possible)?
+	- GUI to show best single ship kill, best average over player, etc other funny stats.

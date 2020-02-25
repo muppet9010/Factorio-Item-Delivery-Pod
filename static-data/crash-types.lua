@@ -6,7 +6,7 @@ local crashTypes = {
             entityName = "item_delivery_pod-tiny_wrecked_ship_container",
             craterName = "item_delivery_pod-medium_scorchmark",
             explosionName = "item_delivery_pod-tiny_wrecked_ship_container_explosion",
-            killRadius = 1,
+            killRadius = 0.75,
             rocks = {
                 small = 10,
                 tiny = 20
@@ -103,8 +103,8 @@ local crashTypes = {
         name = "modular",
         hasTypeValue = true,
         parts = {
-            {name = "modular_bridge", placementGroup = "front", count = 1},
-            {name = "modular_thruster", placementGroup = "back", ratio = 1 / 6},
+            {name = "modular_bridge", placementGroup = "front", exactCount = 1},
+            {name = "modular_thruster", placementGroup = "back", ratioWithMinMax = {min = 1, max = 6, ratio = 1 / 5}},
             {name = "modular_hull", placementGroup = "middle", allRemaining = true}
         },
         partSpacing = 5

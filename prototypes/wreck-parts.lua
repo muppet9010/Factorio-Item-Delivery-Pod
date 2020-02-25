@@ -1,5 +1,6 @@
 local Constants = require("constants")
 local Utils = require("utility/utils")
+local Sounds = require("__base__/prototypes/entity/demo-sounds")
 
 data:extend(
     {
@@ -12,6 +13,7 @@ data:extend(
             icon_size = 32,
             collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
             minable = {mining_time = 0.5},
+            mined_sound = Sounds.generic_impact,
             max_health = 50,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
             resistances = {
@@ -46,6 +48,7 @@ data:extend(
             icon_size = 32,
             collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
             minable = {mining_time = 1},
+            mined_sound = Sounds.generic_impact,
             max_health = 100,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
             resistances = {
@@ -80,7 +83,8 @@ data:extend(
             icon = Constants.AssetModName .. "/graphics/icons/medium_wrecked_ship_container.png",
             icon_size = 32,
             collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
-            minable = {mining_time = 2},
+            minable = {mining_time = 1.5},
+            mined_sound = Sounds.generic_impact,
             max_health = 200,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
             resistances = {
@@ -115,7 +119,8 @@ data:extend(
             icon = Constants.AssetModName .. "/graphics/icons/large_wrecked_ship_container.png",
             icon_size = 32,
             collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
-            minable = {mining_time = 4},
+            minable = {mining_time = 2},
+            mined_sound = Sounds.generic_impact,
             max_health = 400,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
             resistances = {
@@ -151,7 +156,7 @@ data:extend(
             icon = Constants.AssetModName .. "/graphics/icons/modular_bridge_wrecked_ship_container.png",
             icon_size = 32,
             collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
-            minable = {mining_time = 1},
+            minable = {mining_time = 0.5},
             max_health = 50,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
             resistances = {
@@ -187,7 +192,8 @@ data:extend(
             icon = Constants.AssetModName .. "/graphics/icons/modular_thruster_wrecked_ship_container.png",
             icon_size = 32,
             collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
-            minable = {mining_time = 1},
+            minable = {mining_time = 0.5},
+            mined_sound = Sounds.generic_impact,
             max_health = 50,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
             resistances = {
@@ -222,7 +228,8 @@ data:extend(
             icon = Constants.AssetModName .. "/graphics/icons/modular_hull_wrecked_ship_container.png",
             icon_size = 32,
             collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
-            minable = {mining_time = 1},
+            minable = {mining_time = 0.5},
+            mined_sound = Sounds.generic_impact,
             max_health = 50,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
             resistances = {
@@ -258,7 +265,8 @@ data:extend(
             icon = Constants.AssetModName .. "/graphics/icons/debris.png",
             icon_size = 32,
             collision_mask = {"item-layer", "object-layer", "player-layer", "water-tile"},
-            minable = {mining_time = 0.1},
+            minable = {mining_time = 0.2},
+            mined_sound = Sounds.generic_impact,
             max_health = 20,
             flags = {"not-flammable", "hide-alt-info", "placeable-off-grid", "no-automated-item-removal", "no-automated-item-insertion"},
             resistances = {

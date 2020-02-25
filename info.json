@@ -1,13 +1,13 @@
 {
     "name": "item_delivery_pod",
-    "version": "17.0.1",
+    "version": "18.0.2",
     "title": "Item Delivery Pod",
     "author": "Muppet9010",
     "contact": "",
     "homepage": "https://mods.factorio.com/mod/item_delivery_pod",
-    "factorio_version": "0.17",
+    "factorio_version": "0.18",
     "dependencies": [
-        "base >= 0.17"
+        "base >= 0.18"
     ],
     "description": "Have items delivered to you from space"
 }
