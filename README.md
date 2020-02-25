@@ -18,6 +18,7 @@ Is designed to be used with integraions or other mods triggering the item delive
 Command & Remote Interface are the way to trigger a delivery providng the delivery information as arguments.
 
 The "modular" crash type is special in that it is a multiple part ship wreck. it can have its number of parts defined in 1 of 2 ways:
+
 - The number of parts in the total ship can be defined as a number on the end of the name, i.e. "modular6".
 - Setting the weight of the total ship and using auto sizing mode in a special syntax, i.e. "modular-auto-500". The total ship weight is devided by the "Modular ship part weight" setting and rounded down to give the number of parts of the ship. The default for modular ship part weight is 100, but this is an abstract number and only matters in relation to the commands used to supply the total ship weight.
 
@@ -25,6 +26,7 @@ Remote Interface: "item_delivery_pod", "call_crash_ship"
 Command: "item_delivery_pod-call_crash_ship"
 
 Arguments (in order):
+
  - target = either a player name to target or a position (array of x and y [0,0] or a dictionary of x and y key value pairs {"x"=0,"y"=0})
  - radius = either a single number for radius (integer) from the target that the pod will randomly select somewhere to land within. Or as a simple 2 number array [2,10] for the min and max radius from the target it will centre on, for use if you don't want to hit the target position directly.
  - crashTypeName = the name of a pod/ship type for the delivery, either: "tiny", "small", "medium", "large", or "modular".
@@ -34,10 +36,12 @@ All arguments in the command accept strings with spaces in if the strings are wr
 Interface (remote) calls should be made using Lua syntax and not JSON format arguments.
 
 Command examples:
+
 - Call a large ship down near a named player with some iron and coins in it:
 	- `/item_delivery_pod-call_crash_ship "muppet9010" 5 "large" {"iron-plate":100, "coin":100}`
 - Call a tiny ship down in an area around a specific position with no contents:
 	- `/item_delivery_pod-call_crash_ship [10,-10] 50 "tiny" nil`
 
 Mod Settings:
+
 - Modular ship part weight: The weight per modular ship part. Used when the "modular" crash type is used in the "auto" sizing mode and the total ship weight is supplied in the command.
