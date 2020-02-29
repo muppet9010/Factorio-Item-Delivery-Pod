@@ -45,3 +45,16 @@ Command examples:
 Mod Settings:
 
 - Modular ship part weight: The weight per modular ship part. Used when the "modular" crash type is used in the "auto" sizing mode and the total ship weight is supplied in the command.
+
+
+Muppet Coin Based Mod Collection
+------------------
+
+This mod is part of my collection of mods that use the vanilla Factorio coins. They are designed to work togeather or seperately as required. You can also mix with other peoples mods that use vanilla Factorio coins.
+
+- Prime Intergalactic Delivery: a market to buy items for coins.
+- Item Delivery Pod: a crashing spaceship that can bring items to the map with an explosive delivery.
+- Coin Generation: a mod with a variety of ways for players and streamers to generate/obtain coins.
+- Streamlabs RCON Integration: an external tool that lets streamers trigger ingame actions from Streamlabs: https://github.com/muppet9010/Streamlabs-Rcon-Integration
+
+A numebr of my other mods are designed for streamers or have features to make them streamer friendly.

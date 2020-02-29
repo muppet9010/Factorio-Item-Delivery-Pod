@@ -1,4 +1,5 @@
 Next:
+	- look to use the new large scorchmark rather than scaling up the medium one.
 	- record a description tag when calling in ships as optional. we will pass in supporter name for Will's games
 	- Add in flying text over the crashed ship of who's donation, type and value it is. Optional mod setting.
 	- record damage/kills done by each ship to table
