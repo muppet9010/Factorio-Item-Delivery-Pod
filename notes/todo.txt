@@ -1,10 +1,16 @@
+TODO:
+	- fix the removal of the wreck entiteis from base game. Just copy old stuff in to the mod for now.
+
 Next:
+    - if the commands are called with no arguments it errors on trying to log the failure as command.paramater is nil. also check other mods for this issue and log on them.
+	- add a distributed random via a new Utils. In this case it will be the final centre point of the crashed ship and not te player offset.
 	- look to use the new large scorchmark rather than scaling up the medium one.
 	- record a description tag when calling in ships as optional. we will pass in supporter name for Will's games
 	- Add in flying text over the crashed ship of who's donation, type and value it is. Optional mod setting.
 	- record damage/kills done by each ship to table
 	- simple export option of supports delivery pods and their kills.
 	- debris has some random low level items in them.
+	- look to add a bit of randomness to the parts of ships & modular parts so they don't all impact and have effects generated at exactly same time, maybe delay left to right with slight randomness.
 
 
 Future:
